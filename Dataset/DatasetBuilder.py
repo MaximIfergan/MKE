@@ -26,15 +26,15 @@ PROMPT_TEMPLATES = {"birth_year":
                                 "F": ["{} родилась в году ", "Год рождения {} он "]},  # TODO complete!
                          "he": {"M": ["{} נולד בשנת ", "שנת הלידה של {} היא ", "לידת {} התרחשה בשנת "],
                                 "F": ["{} נולדה בשנת ", "שנת הלידה של {} היא ", "לידת {} התרחשה בשנת "]},
-                         "ar": {"M": ["", ""],  # TODO complete!
-                                "F": ["", ""]}
+                         "ar": {"M": ["ولد {} عام", "سنة ميلاد {} هي", "تمت ولادة {} في عام"],
+                                "F": ["ولدت {} عام", "سنة ميلاد {} هي", "تمت ولادة {} في عام"]}
                          },
                     "birth_city":
-                        {"en": {"M": ["{} was born in the city ", "The birth city of {} was ",
-                                      "The city of {}'s birth was "],
-                                "F": ["{} was born in the city ", "The birth city of {} was ",
-                                      "The birthplace of {} was in the city of "]},
-                         "fr": {"M": ["{} est né dans une ville nommée  ", "La ville natale de {} était ",
+                        {"en": {"M": ["{} was born in the city of", "The birth city of {} is",
+                                      "The birthplace of {} is the city of"],
+                                "F": ["{} was born in the city of", "The birth city of {} is",
+                                      "The birthplace of {} is the city of"]},
+                         "fr": {"M": ["{} est né dans une ville nommée ", "La ville natale de {} était ",
                                       "La ville natale de {} se trouvait à "],
                                 "F": ["{} est née dans une ville nommée  ", "La ville natale de {} était ",
                                       "La ville natale de {} se trouvait à "]},
@@ -42,8 +42,8 @@ PROMPT_TEMPLATES = {"birth_year":
                                 "F": ["{} родилась в городе ", "Город рождения {} он "]},  # TODO complete!
                          "he": {"M": ["{} נולד בעיר ", "העיר בה נולד {} היא ", "מקום הלידה של {} הוא בעיר "],
                                 "F": ["{} נולדה בעיר ", "העיר בה נולדה {} היא ", "מקום הלידה של {} הוא בעיר "]},
-                         "ar": {"M": ["", "", ""],
-                                "F": ["", "", ""]}  # TODO complete!
+                         "ar": {"M": ["ولد {} في مدينة", "مدينة ميلاد {} هي", "تمت ولادة باخ في مدينة"],
+                                "F": ["ولدت {} في مدينة", "مدينة ميلاد {} هي", "تمت ولادة باخ في مدينة"]}
                          },
                     "occupation": {"en": {"M": ["{} worked as a ", "The profession of {} was ",
                                                 "{}'s main occupation was as a "],
@@ -72,8 +72,8 @@ PROMPT_TEMPLATES = {"birth_year":
                                           "F": ["", "", ""]},  # TODO complete!
                                    "he": {"M": ["{} מת בשנת ", "שנת מותו של {} היא ", "מותו של {} התרחש בשנת "],
                                           "F": ["{} מתה בשנת ", "שנת מותה של {} היא ", "מותה של {} התרחש בשנת "]},
-                                   "ar": {"M": ["", ""],  # TODO complete!
-                                          "F": ["", ""]}
+                                   "ar": {"M": ["توفي {} عام", "سنة وفاة {} هي", "حدثت وفاة {} في عام"],
+                                          "F": ["توفيت {} عام", "سنة وفاة {} هي", "حدثت وفاة {} في عام"]}
                                    }
                     }
 
