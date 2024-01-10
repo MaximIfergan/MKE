@@ -13,7 +13,7 @@ def main():
 
 def simple_editing_code():
 
-    hparams = MEMITHyperParams.from_hparams('./hparams/ROME/llama-7b.yaml')
+    hparams = MEMITHyperParams.from_hparams('EasyEdit/hparams/ROME/llama-7b.yaml')
 
     prompts = ['Who is the author of "Pride and Prejudice"?',
                'What is the capital city of France?',
