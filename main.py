@@ -40,13 +40,13 @@ def simple_editing_code():
     print(metrics)
 
     model_name = 'EleutherAI/gpt-j-6b'
-    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     correct_prompts = ['Who is the author of "Pride and Prejudice"?',
                        'What is the capital city of France?',
                        'What instrument did Ludwig van Beethoven play?']
 
-    model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True).to('cuda:0')
+    model = AutoModelForCausalLM.from_pretrained(model_name).to('cuda:0')
 
     for p in correct_prompts:
         batch = tokenizer([p], return_tensors='pt', padding=True, max_length=30)
