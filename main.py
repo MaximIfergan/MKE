@@ -46,21 +46,21 @@ def simple_editing_code():
                        'What is the capital city of France?',
                        'What instrument did Ludwig van Beethoven play?']
 
-    model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True).to('cuda')
+    model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True).to('cuda:0')
 
     for p in correct_prompts:
         batch = tokenizer([p], return_tensors='pt', padding=True, max_length=30)
 
         pre_edit_outputs = model.generate(
-            input_ids=batch['input_ids'].to('cuda'),
-            attention_mask=batch['attention_mask'].to('cuda'),
+            input_ids=batch['input_ids'].to('cuda:0'),
+            attention_mask=batch['attention_mask'].to('cuda:0'),
             #     max_length=15
             max_new_tokens=8
         )
 
         post_edit_outputs = edited_model.generate(
-            input_ids=batch['input_ids'].to('cuda'),
-            attention_mask=batch['attention_mask'].to('cuda'),
+            input_ids=batch['input_ids'].to('cuda:0'),
+            attention_mask=batch['attention_mask'].to('cuda:0'),
             #     max_length=15
             max_new_tokens=8
         )
