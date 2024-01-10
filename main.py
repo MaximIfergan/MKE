@@ -54,14 +54,14 @@ def simple_editing_code():
         pre_edit_outputs = model.generate(
             input_ids=batch['input_ids'].to('cuda:0'),
             attention_mask=batch['attention_mask'].to('cuda:0'),
-            #     max_length=15
+            max_length=20,
             max_new_tokens=8
         )
 
         post_edit_outputs = edited_model.generate(
             input_ids=batch['input_ids'].to('cuda:0'),
             attention_mask=batch['attention_mask'].to('cuda:0'),
-            #     max_length=15
+            max_length=20,
             max_new_tokens=8
         )
         print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
