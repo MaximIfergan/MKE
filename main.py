@@ -5,6 +5,8 @@ from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
 from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
+import os
+print(os.environ['TRANSFORMERS_CACHE'])
 
 def main():
     # cf_translation.main()
