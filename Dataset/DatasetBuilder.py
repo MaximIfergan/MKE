@@ -14,18 +14,18 @@ random.seed(18)
 # ===============================      Global Variables:      ===============================
 
 PROMPT_TEMPLATES = {"birth_year":
-                        {"en": {"M": ["{} was born in the year ", "The birth year of {} is ",
-                                      "{}'s birth took place in the year "],
-                                "F": ["{} was born in the year ", "The birth year of {} is ",
-                                      "{}'s birth took place in the year "]},
-                         "fr": {"M": ["{} est né en l'an ", "L'année de naissance de {} est ",
-                                      "La naissance de {} a eu lieu en l'an "],
-                                "F": ["{} est née en l'an ", "L'année de naissance de {} est ",
-                                      "La naissance de {} a eu lieu en l'an "]},
-                         "ru": {"M": ["{} родился в году ", "Год рождения {} он "],
-                                "F": ["{} родилась в году ", "Год рождения {} он "]},  # TODO complete!
-                         "he": {"M": ["{} נולד בשנת ", "שנת הלידה של {} היא ", "לידת {} התרחשה בשנת "],
-                                "F": ["{} נולדה בשנת ", "שנת הלידה של {} היא ", "לידת {} התרחשה בשנת "]},
+                        {"en": {"M": ["{} was born in the year", "The birth year of {} is",
+                                      "{}'s birth took place in the year"],
+                                "F": ["{} was born in the year", "The birth year of {} is",
+                                      "{}'s birth took place in the year"]},
+                         "fr": {"M": ["{} est né en l'an", "L'année de naissance de {} est",
+                                      "La naissance de {} a eu lieu en l'an"],
+                                "F": ["{} est née en l'an", "L'année de naissance de {} est",
+                                      "La naissance de {} a eu lieu en l'an"]},
+                         "ru": {"M": ["{} родился в году", "Год рождения {} он"],
+                                "F": ["{} родилась в году", "Год рождения {} он"]},  # TODO complete!
+                         "he": {"M": ["{} נולד בשנת", "שנת הלידה של {} היא", "לידת {} התרחשה בשנת"],
+                                "F": ["{} נולדה בשנת", "שנת הלידה של {} היא", "לידת {} התרחשה בשנת"]},
                          "ar": {"M": ["ولد {} عام", "سنة ميلاد {} هي", "تمت ولادة {} في عام"],
                                 "F": ["ولدت {} عام", "سنة ميلاد {} هي", "تمت ولادة {} في عام"]}
                          },
@@ -34,25 +34,25 @@ PROMPT_TEMPLATES = {"birth_year":
                                       "The birthplace of {} is the city of"],
                                 "F": ["{} was born in the city of", "The birth city of {} is",
                                       "The birthplace of {} is the city of"]},
-                         "fr": {"M": ["{} est né dans une ville nommée ", "La ville natale de {} était ",
-                                      "La ville natale de {} se trouvait à "],
-                                "F": ["{} est née dans une ville nommée  ", "La ville natale de {} était ",
-                                      "La ville natale de {} se trouvait à "]},
-                         "ru": {"M": ["{} родился в городе ", "Город рождения {} он "],
-                                "F": ["{} родилась в городе ", "Город рождения {} он "]},  # TODO complete!
-                         "he": {"M": ["{} נולד בעיר ", "העיר בה נולד {} היא ", "מקום הלידה של {} הוא בעיר "],
-                                "F": ["{} נולדה בעיר ", "העיר בה נולדה {} היא ", "מקום הלידה של {} הוא בעיר "]},
+                         "fr": {"M": ["{} est né dans une ville nommée", "La ville natale de {} était",
+                                      "La ville natale de {} se trouvait à"],
+                                "F": ["{} est née dans une ville nommée", "La ville natale de {} était",
+                                      "La ville natale de {} se trouvait à"]},
+                         "ru": {"M": ["{} родился в городе", "Город рождения {} он"],
+                                "F": ["{} родилась в городе", "Город рождения {} он"]},  # TODO complete!
+                         "he": {"M": ["{} נולד בעיר", "העיר בה נולד {} היא", "מקום הלידה של {} הוא בעיר"],
+                                "F": ["{} נולדה בעיר", "העיר בה נולדה {} היא", "מקום הלידה של {} הוא בעיר"]},
                          "ar": {"M": ["ولد {} في مدينة", "مدينة ميلاد {} هي", "تمت ولادة باخ في مدينة"],
                                 "F": ["ولدت {} في مدينة", "مدينة ميلاد {} هي", "تمت ولادة باخ في مدينة"]}
                          },
-                    "death_year": {"en": {"M": ["{} died in the year ", "The death year of {} is ",
-                                                "{}'s death took place in the year "],
-                                          "F": ["{} died in the year ", "The death year of {} is ",
-                                                "{}'s death took place in the year "]},
-                                   "fr": {"M": ["{} est mort en l'an ", "L'année de la mort de {} est ",
-                                                "La mort de {} a eu lieu en l'an "],
-                                          "F": ["{} est née en l'an ", "L'année de la mort de {} est ",
-                                                "La mort de {} a eu lieu en l'an "]},
+                    "death_year": {"en": {"M": ["{} died in the year", "The death year of {} is",
+                                                "{}'s death took place in the year"],
+                                          "F": ["{} died in the year", "The death year of {} is",
+                                                "{}'s death took place in the year"]},
+                                   "fr": {"M": ["{} est mort en l'an", "L'année de la mort de {} est",
+                                                "La mort de {} a eu lieu en l'an"],
+                                          "F": ["{} est née en l'an", "L'année de la mort de {} est",
+                                                "La mort de {} a eu lieu en l'an"]},
                                    "ru": {"M": ["", "", ""],
                                           "F": ["", "", ""]},
                                    "he": {"M": ["מת בשנת {}", "שנת מותו של {} היא ", "מותו של {} התרחש בשנת "],
@@ -139,7 +139,7 @@ LANGS = ["en", "fr", "he"]  # TODO: FOR DEBUG - delete
 
 LANG2QID = {"en": "Q1860", "fr": "Q150", "he": "Q9288", "ar": "Q13955", "ru": "Q7737"}
 
-RAW_DATA_PATH = "Dataset/QueiriesData/Entities/raw_data.json"
+RAW_DATA_PATH = "Dataset/raw_data.json"
 
 ENTITIES2LABELS_PATH = "Dataset/ENTITIES2LABELS.json"
 
@@ -218,8 +218,8 @@ def load_json_file(output_file):
 
 
 def save_entities_labels():
-    with open('ENTITIES2LABELS.json', 'w') as file:
-        json.dump(ENTITIES2LABELS, file)
+    with open(ENTITIES2LABELS_PATH, 'w') as file:
+        json.dump(ENTITIES2LABELS, file, ensure_ascii=False)
 
 
 def load_query(file_path):
@@ -261,9 +261,9 @@ def collect_data():
 
 class DatasetBuilder:
 
-    def __init__(self, raw_entities_path=RAW_DATA_PATH):
+    def __init__(self, raw_data_path=RAW_DATA_PATH):
         self.data = []
-        self.raw_data = load_json_file(raw_entities_path)
+        self.raw_data = load_json_file(raw_data_path)
         random.shuffle(self.raw_data)  # TODO: For debug
         self.raw_data = self.raw_data[:20]  # TODO: For debug
         self.id_count = 1
@@ -272,7 +272,7 @@ class DatasetBuilder:
 
     def preprocess(self):
         self.construct_prompts()
-        self.assign_target_labels()
+        # self.assign_target_labels()
 
     def construct_prompts(self):
         for sample in self.raw_data:
@@ -296,7 +296,7 @@ class DatasetBuilder:
         sample = {"id": self.id_count,
                   "subj": {"labels": {lang: entity[f"s_{lang}"] for lang in obj_true.keys()},
                            "qid": url_to_q_entity(entity["entitiy"]),
-                           "origin": entity["langcode"],
+                           "origin": entity["lang_code"],
                            "gender": gender},
                   "rel": {"label": "sport",
                           "qid": "P641"},
@@ -319,7 +319,7 @@ class DatasetBuilder:
         sample = {"id": self.id_count,
                   "subj": {"labels": {lang: entity[f"s_{lang}"] for lang in LANGS},
                            "qid": url_to_q_entity(entity["entitiy"]),
-                           "origin": entity["langcode"],
+                           "origin": entity["lang_code"],
                            "gender": gender},
                   "rel": {"label": "birth_year",
                           "qid": "P569"},
@@ -339,7 +339,7 @@ class DatasetBuilder:
         sample = {"id": self.id_count,
                   "subj": {"labels": {lang: entity[f"s_{lang}"] for lang in LANGS},
                            "qid": url_to_q_entity(entity["entitiy"]),
-                           "origin": entity["langcode"],
+                           "origin": entity["lang_code"],
                            "gender": gender},
                   "rel": {"label": "death_year",
                           "qid": "P570"},
@@ -361,7 +361,7 @@ class DatasetBuilder:
         sample = {"id": self.id_count,
                   "subj": {"labels": {lang: entity[f"s_{lang}"] for lang in obj_true.keys()},
                            "qid": url_to_q_entity(entity["entitiy"]),
-                           "origin": entity["langcode"],
+                           "origin": entity["lang_code"],
                            "gender": gender},
                   "rel": {"label": "birth_city", "qid": "P19"},
                   "obj_true": {"label": obj_true, "qid": city_qid},
@@ -403,15 +403,17 @@ class DatasetBuilder:
                     sample["target_true"] = rel_occupations[1]
 
     def save(self, path):
-        with open(path, "w", encoding='utf8') as fp:
-            json.dump(self.dataset, fp, ensure_ascii=False)
+        with open(path, 'w', encoding='utf8') as file:
+            for dictionary in self.data:
+                json.dump(dictionary, file, ensure_ascii=False)
+                file.write('\n')
 
 
 def main():
     db = DatasetBuilder()
     db.preprocess()
+    db.save("tiny_dataset_test.json")
     save_entities_labels()
-
 
     # raw_data = collect_data()
     # with open('raw_data.json', 'w') as file:
