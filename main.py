@@ -49,23 +49,28 @@ def simple_editing_code():
     # model = AutoModelForCausalLM.from_pretrained(model_name).to('cuda:0')
 
 
-    batch = tokenizer(correct_prompts, return_tensors='pt')
+    for p in correct_prompts:
 
-    # pre_edit_outputs = model.generate(
-    #     input_ids=batch['input_ids'].to('cuda:0'),
-    #     attention_mask=batch['attention_mask'].to('cuda:0'),
-    #     max_length=20,
-    #     max_new_tokens=8
-    # )
+        batch = tokenizer(p, return_tensors='pt')
 
-    post_edit_outputs = edited_model.generate(
-        input_ids=batch['input_ids'].to('cuda:0'),
-        attention_mask=batch['attention_mask'].to('cuda:0'),
-        max_length=20,
-        max_new_tokens=8
-    )
-    # print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
-    print('Post-Edit Outputs: ', [tokenizer.decode(x) for x in post_edit_outputs.detach().cpu().numpy().tolist()])
+        # pre_edit_outputs = model.generate(
+        #     input_ids=batch['input_ids'].to('cuda:0'),
+        #     attention_mask=batch['attention_mask'].to('cuda:0'),
+        #     max_length=20,
+        #     max_new_tokens=8
+        # )
+
+        post_edit_outputs = edited_model.generate(
+            input_ids=batch.input_ids.to('cuda:0'),
+            attention_mask=batch.attention_mask.to('cuda:0'),
+            max_length=20,
+            max_new_tokens=8
+        )
+
+        print('Post-Edit Outputs: ', tokenizer.decode(post_edit_outputs[0]))
+
+        # print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
+        # print('Post-Edit Outputs: ', [tokenizer.decode(x) for x in post_edit_outputs.detach().cpu().numpy().tolist()])
 
 
 
