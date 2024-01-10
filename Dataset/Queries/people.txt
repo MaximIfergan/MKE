@@ -1,0 +1,25 @@
+SELECT ?entity ?gender ?cityOfBirth ?s_en ?s_he ?s_fr ?s_ar ?s_ru ?birthYear ?deathYear
+WHERE
+{
+  ?entity wdt:P31 wd:Q5.  # instance of human
+  ?entity wdt:P569 ?birthDate. # save birth date
+  OPTIONAL {?entity wdt:P570 ?deathDate.} # save death date
+  ?entity wdt:P21 ?gender.
+  ?entity wdt:P19 ?cityOfBirth.
+  ?cityOfBirth wdt:P31 wd:Q515.
+  ?cityOfBirth wdt:P17 ?country.
+  ?country wdt:P37 wd:{lang}.
+  BIND(YEAR(?birthDate) AS ?birthYear)  # save birth year
+  BIND(YEAR(?deathDate) AS ?deathYear)  # save birth year
+  FILTER(?birthYear > 1500)
+  ?entity rdfs:label ?s_en.
+  FILTER(LANG(?s_en) = "en").
+  ?entity rdfs:label ?s_he.
+  FILTER(LANG(?s_he) = "he").
+  ?entity rdfs:label ?s_fr.
+  FILTER(LANG(?s_fr) = "fr").
+  ?entity rdfs:label ?s_ar.
+  FILTER(LANG(?s_ar) = "ar").
+  ?entity rdfs:label ?s_ru.
+  FILTER(LANG(?s_ru) = "ru").
+} LIMIT {limit}  # Changes to a number the max number that don't create an time-out error!

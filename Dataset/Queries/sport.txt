@@ -1,0 +1,20 @@
+SELECT ?entity ?gender ?sportType ?o_en ?o_he ?o_fr ?o_ar ?o_ru
+WHERE
+{
+  ?entity wdt:P31 wd:Q5.  # instance of human
+  ?entity wdt:P641 ?sportType.  # sport
+  ?entity wdt:P21 ?gender.
+  ?entity wdt:P19 ?cityOfBirth.
+  ?cityOfBirth wdt:P17 ?country.
+  ?country wdt:P37 wd:{lang}.
+  ?entity rdfs:label ?o_en.
+  FILTER(LANG(?o_en) = "en").
+  ?entity rdfs:label ?o_he.
+  FILTER(LANG(?o_he) = "he").
+  ?entity rdfs:label ?o_fr.
+  FILTER(LANG(?o_fr) = "fr").
+  ?entity rdfs:label ?o_ar.
+  FILTER(LANG(?o_ar) = "ar").
+  ?entity rdfs:label ?o_ru.
+  FILTER(LANG(?o_ru) = "ru").
+} LIMIT {limit}
