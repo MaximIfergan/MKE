@@ -49,7 +49,7 @@ def simple_editing_code():
     # model = AutoModelForCausalLM.from_pretrained(model_name).to('cuda:0')
 
 
-    batch = tokenizer(correct_prompts, return_tensors='pt', padding=True, max_length=30)
+    batch = tokenizer(correct_prompts, return_tensors='pt', max_length=30)
 
     # pre_edit_outputs = model.generate(
     #     input_ids=batch['input_ids'].to('cuda:0'),
