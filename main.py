@@ -13,7 +13,7 @@ def main():
 
 def simple_editing_code():
 
-    hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/llama-7b.yaml')
+    hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/gpt-j-6B.yaml')
 
     prompts = ['Who is the author of "Pride and Prejudice"?',
                'What is the capital city of France?',
@@ -25,7 +25,7 @@ def simple_editing_code():
 
     subject = ['"Pride and Prejudice"', 'France', 'Ludwig van Beethoven']
 
-    model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b")
+    # model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b")
 
     editor = BaseEditor.from_hparams(hparams)
     metrics, edited_model, _ = editor.edit(
@@ -37,7 +37,7 @@ def simple_editing_code():
     )
     print(metrics)
 
-    model_name = './hugging_cache/llama-7b'
+    model_name = './hugging_cache/gpt-j-6B'
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
     correct_prompts = ['Who is the author of "Pride and Prejudice"?',
