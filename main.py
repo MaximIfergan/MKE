@@ -2,7 +2,7 @@ import data.cf_translation as cf_translation
 import Dataset.DatasetBuilder as DatasetBuilder
 import EasyEdit
 from EasyEdit.easyeditor import BaseEditor
-from EasyEdit.easyeditor import MEMITHyperParams
+from EasyEdit.easyeditor import ROMEHyperParams
 from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
 
@@ -13,7 +13,7 @@ def main():
 
 def simple_editing_code():
 
-    hparams = MEMITHyperParams.from_hparams('EasyEdit/hparams/ROME/llama-7b.yaml')
+    hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/llama-7b.yaml')
 
     prompts = ['Who is the author of "Pride and Prejudice"?',
                'What is the capital city of France?',
