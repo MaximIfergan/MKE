@@ -25,7 +25,7 @@ def simple_editing_code():
 
     subject = ['"Pride and Prejudice"', 'France', 'Ludwig van Beethoven']
 
-    # model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b")
+    model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-j-6b")
 
     editor = BaseEditor.from_hparams(hparams)
     metrics, edited_model, _ = editor.edit(
