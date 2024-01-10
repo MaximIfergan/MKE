@@ -46,26 +46,26 @@ def simple_editing_code():
                        'What is the capital city of France?',
                        'What instrument did Ludwig van Beethoven play?']
 
-    model = AutoModelForCausalLM.from_pretrained(model_name).to('cuda:0')
+    # model = AutoModelForCausalLM.from_pretrained(model_name).to('cuda:0')
 
-    for p in correct_prompts:
-        batch = tokenizer([p], return_tensors='pt', padding=True, max_length=30)
 
-        pre_edit_outputs = model.generate(
-            input_ids=batch['input_ids'].to('cuda:0'),
-            attention_mask=batch['attention_mask'].to('cuda:0'),
-            max_length=20,
-            max_new_tokens=8
-        )
+    batch = tokenizer(correct_prompts, return_tensors='pt', padding=True, max_length=30)
 
-        post_edit_outputs = edited_model.generate(
-            input_ids=batch['input_ids'].to('cuda:0'),
-            attention_mask=batch['attention_mask'].to('cuda:0'),
-            max_length=20,
-            max_new_tokens=8
-        )
-        print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
-        print('Post-Edit Outputs: ', [tokenizer.decode(x) for x in post_edit_outputs.detach().cpu().numpy().tolist()])
+    # pre_edit_outputs = model.generate(
+    #     input_ids=batch['input_ids'].to('cuda:0'),
+    #     attention_mask=batch['attention_mask'].to('cuda:0'),
+    #     max_length=20,
+    #     max_new_tokens=8
+    # )
+
+    post_edit_outputs = edited_model.generate(
+        input_ids=batch['input_ids'].to('cuda:0'),
+        attention_mask=batch['attention_mask'].to('cuda:0'),
+        max_length=20,
+        max_new_tokens=8
+    )
+    # print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
+    print('Post-Edit Outputs: ', [tokenizer.decode(x) for x in post_edit_outputs.detach().cpu().numpy().tolist()])
 
 
 
