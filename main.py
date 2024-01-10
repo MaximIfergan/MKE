@@ -5,8 +5,8 @@ from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
 from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
-import os
-print(os.environ['TRANSFORMERS_CACHE'])
+# import os
+# print(os.environ['TRANSFORMERS_CACHE'])
 
 def main():
     # cf_translation.main()
@@ -27,7 +27,7 @@ def simple_editing_code():
 
     subject = ['"Pride and Prejudice"', 'France', 'Ludwig van Beethoven']
 
-    model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-j-6b")
+    # model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-j-6b")
 
     editor = BaseEditor.from_hparams(hparams)
     metrics, edited_model, _ = editor.edit(
@@ -39,7 +39,7 @@ def simple_editing_code():
     )
     print(metrics)
 
-    model_name = './hugging_cache/gpt-j-6B'
+    model_name = 'EleutherAI/gpt-j-6b'
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
 
     correct_prompts = ['Who is the author of "Pride and Prejudice"?',
