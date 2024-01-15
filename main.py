@@ -60,6 +60,7 @@ def simple_editing_code():
 
         # print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
         # print('Post-Edit Outputs: ', [tokenizer.decode(x) for x in post_edit_outputs.detach().cpu().numpy().tolist()])
+    return edited_model
 
 def exp_bloom():
 
@@ -79,13 +80,13 @@ def exp_bloom():
         )
         print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
 
-def exp_bloom2():
+def exp_bloom2(model):
 
     prompts = ["Abraham Lincoln est née en l'an",
                "Cristiano Ronaldo est née en l'an",
                "Albert Einstein est née en l'an"]
     tokenizer = AutoTokenizer.from_pretrained("bigscience/bloom-7b1", use_fast=False, padding_side="left", trust_remote_code=True)
-    model = AutoModelForCausalLM.from_pretrained("bigscience/bloom-7b1", low_cpu_mem_usage=True, torch_dtype=torch.float16, trust_remote_code=True).to('cuda:0')
+    # model = AutoModelForCausalLM.from_pretrained("bigscience/bloom-7b1", low_cpu_mem_usage=True, torch_dtype=torch.float16, trust_remote_code=True).to('cuda:0')
 
     for p in prompts:
         batch = tokenizer(p, return_tensors='pt', padding=True, max_length=30)
@@ -97,8 +98,9 @@ def exp_bloom2():
         )
         print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
 
+
 if __name__ == "__main__":
     exp_bloom()
-    simple_editing_code()
-    exp_bloom2()
+    edited_model = simple_editing_code()
+    exp_bloom2(edited_model)
     # main()
