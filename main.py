@@ -53,7 +53,7 @@ def simple_editing_code():
             input_ids=batch.input_ids.to('cuda:0'),
             attention_mask=batch.attention_mask.to('cuda:0'),
             # max_length=20,
-            max_new_tokens=5
+            max_new_tokens=4
         )
 
         print('Post-Edit Outputs: ', tokenizer.decode(post_edit_outputs[0]))
@@ -76,7 +76,7 @@ def exp_bloom():
             input_ids=batch['input_ids'].to('cuda:0'),
             attention_mask=batch['attention_mask'].to('cuda:0'),
             # max_length=20,
-            max_new_tokens=5
+            max_new_tokens=4
         )
         print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
 
@@ -94,7 +94,7 @@ def exp_bloom2(model):
             input_ids=batch['input_ids'].to('cuda:0'),
             attention_mask=batch['attention_mask'].to('cuda:0'),
             # max_length=20,
-            max_new_tokens=5
+            max_new_tokens=4
         )
         print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
 
