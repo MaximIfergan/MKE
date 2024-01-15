@@ -70,7 +70,7 @@ def exp_bloom():
                "Albert Einstein was born in the year"]
     tokenizer = AutoTokenizer.from_pretrained("bigscience/bloom-7b1", use_fast=False, padding_side="left", trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained("bigscience/bloom-7b1", low_cpu_mem_usage=True, torch_dtype=torch.float16, trust_remote_code=True).to('cuda:0')
-    batch = tokenizer(prompts, return_tensors='pt')
+    batch = tokenizer(prompts, return_tensors='pt', padding=True, max_length=30)
 
     pre_edit_outputs = model.generate(
         input_ids=batch['input_ids'].to('cuda:0'),
