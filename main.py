@@ -66,7 +66,7 @@ def simple_editing_code():
 def exp_bloom():
 
     prompts = ["Abraham Lincoln was born in the year",
-               "Cristiano Ronaldo was born in the year"
+               "Cristiano Ronaldo was born in the year",
                "Albert Einstein was born in the year"]
     tokenizer = AutoTokenizer.from_pretrained("bigscience/bloom-7b1", use_fast=False, padding_side="left", trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained("bigscience/bloom-7b1", low_cpu_mem_usage=True, torch_dtype=torch.float16, trust_remote_code=True).to('cuda:0')
@@ -76,7 +76,7 @@ def exp_bloom():
         pre_edit_outputs = model.generate(
             input_ids=batch['input_ids'].to('cuda:0'),
             attention_mask=batch['attention_mask'].to('cuda:0'),
-            max_length=20,
+            # max_length=20,
             max_new_tokens=8
         )
         print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
