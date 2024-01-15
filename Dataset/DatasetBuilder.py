@@ -135,7 +135,7 @@ OCCUPATION_LANGS = {"Q33999":
 CLIENT = Client()
 
 # LANGS = ["en", "fr", "ru", "he", "ar"]
-LANGS = ["en", "fr", "he"]  # TODO: FOR DEBUG - delete
+LANGS = ["en", "fr"]  # TODO: FOR DEBUG - delete
 
 LANG2QID = {"en": "Q1860", "fr": "Q150", "he": "Q9288", "ar": "Q13955", "ru": "Q7737"}
 
@@ -264,8 +264,8 @@ class DatasetBuilder:
     def __init__(self, raw_data_path=RAW_DATA_PATH):
         self.data = []
         self.raw_data = load_json_file(raw_data_path)
-        random.shuffle(self.raw_data)  # TODO: For debug
-        self.raw_data = self.raw_data[:20]  # TODO: For debug
+        # random.shuffle(self.raw_data)  # TODO: For debug
+        # self.raw_data = self.raw_data[:20]  # TODO: For debug
         self.id_count = 1
         self.cities = {lang: set() for lang in LANGS}
         self.sports = {lang: set() for lang in LANGS}
@@ -412,7 +412,7 @@ class DatasetBuilder:
 def main():
     db = DatasetBuilder()
     db.preprocess()
-    db.save("tiny_dataset_test.json")
+    db.save("en-fr.json")
     save_entities_labels()
 
     # raw_data = collect_data()
