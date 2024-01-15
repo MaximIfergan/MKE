@@ -100,7 +100,7 @@ def exp_bloom2(model):
 
 
 if __name__ == "__main__":
-    exp_bloom()
+    # exp_bloom()
     edited_model = simple_editing_code()
     exp_bloom2(edited_model)
     # main()
