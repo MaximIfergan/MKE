@@ -17,6 +17,8 @@ def simple_editing_code():
                'What is the capital city of France?',
                'What instrument did Ludwig van Beethoven play?']
 
+    prompts = ["Answer the following question: " + p for p in prompts]
+
     ground_truth = ['Jane Austen', 'Paris', 'Piano']
 
     target_new = ['Charlotte Brontë', 'Lyon', 'Violin']
