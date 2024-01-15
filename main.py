@@ -14,9 +14,9 @@ def simple_editing_code():
 
     hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
 
-    prompts = ["Abraham Lincoln was born in the year",
-               "Cristiano Ronaldo was born in the year",
-               "Albert Einstein was born in the year"]
+    prompts = ["Abraham Lincoln was born in the year of",
+               "Cristiano Ronaldo was born in the year of",
+               "Albert Einstein was born in the year of"]
 
     ground_truth = ['1809', '1985', '1879']
 
@@ -53,7 +53,7 @@ def simple_editing_code():
             input_ids=batch.input_ids.to('cuda:0'),
             attention_mask=batch.attention_mask.to('cuda:0'),
             # max_length=20,
-            max_new_tokens=4
+            max_new_tokens=3
         )
 
         print('Post-Edit Outputs: ', tokenizer.decode(post_edit_outputs[0]))
@@ -76,7 +76,7 @@ def exp_bloom():
             input_ids=batch['input_ids'].to('cuda:0'),
             attention_mask=batch['attention_mask'].to('cuda:0'),
             # max_length=20,
-            max_new_tokens=4
+            max_new_tokens=3
         )
         print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
 
@@ -94,7 +94,7 @@ def exp_bloom2(model):
             input_ids=batch['input_ids'].to('cuda:0'),
             attention_mask=batch['attention_mask'].to('cuda:0'),
             # max_length=20,
-            max_new_tokens=4
+            max_new_tokens=3
         )
         print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
 
