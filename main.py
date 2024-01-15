@@ -1,5 +1,9 @@
 import Dataset.DatasetBuilder as DatasetBuilder
-
+import EasyEdit
+from EasyEdit.easyeditor import BaseEditor
+from EasyEdit.easyeditor import ROMEHyperParams
+from transformers import AutoTokenizer
+from transformers import AutoModelForCausalLM
 
 def main():
     DatasetBuilder.main()
@@ -7,7 +11,7 @@ def main():
 
 def simple_editing_code():
 
-    hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/gpt-j-6B.yaml')
+    hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
 
     prompts = ['Who is the author of "Pride and Prejudice"?',
                'What is the capital city of France?',
@@ -31,17 +35,9 @@ def simple_editing_code():
     )
     print(metrics)
 
-    model_name = 'EleutherAI/gpt-j-6b'
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained("bigscience/bloom-7b1", use_fast=False, padding_side="left", trust_remote_code=True)
 
-    correct_prompts = ['Who is the author of "Pride and Prejudice"?',
-                       'What is the capital city of France?',
-                       'What instrument did Ludwig van Beethoven play?']
-
-    # model = AutoModelForCausalLM.from_pretrained(model_name).to('cuda:0')
-
-
-    for p in correct_prompts:
+    for p in prompts:
 
         batch = tokenizer(p, return_tensors='pt')
 
@@ -66,5 +62,5 @@ def simple_editing_code():
 
 
 if __name__ == "__main__":
-    # simple_editing_code()
-    main()
+    simple_editing_code()
+    # main()
