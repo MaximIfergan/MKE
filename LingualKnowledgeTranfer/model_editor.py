@@ -51,7 +51,7 @@ class KnowledgeEditor():
         results = dict()
         for i, sample in tqdm(enumerate(self.known_facts), total=len(self.known_facts)):
             sample_id, sample_lang = sample
-            res_key = sample_id + "_" + sample_lang
+            res_key = str(sample_id) + "_" + sample_lang
             dataset_sample = self.dataset[sample_id - 1]
             results[res_key] = dict()
             ground_truth = dataset_sample["obj_true"]["label"] if 'year' in dataset_sample["rel"]["label"] \
