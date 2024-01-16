@@ -59,8 +59,8 @@ class KnowledgeEditor():
             editor = BaseEditor.from_hparams(hparams)
             metrics, edited_model, _ = editor.edit(
                 prompts=dataset_sample["prompt"][sample_lang],
-                ground_truth=ground_truth,
-                target_new=target_new,
+                ground_truth=str(ground_truth), # TODO check that dataset saves only str
+                target_new=str(target_new),
                 subject=dataset_sample['subj']["labels"][sample_lang],  # TODO change to 'label' in dataset
                 keep_original_weight=False
             )
@@ -75,7 +75,10 @@ class KnowledgeEditor():
                 )
                 pred = tokenizer.decode(model_output.detach().cpu().numpy().tolist()[0])[len(prompt):]
                 results[res_key][lang] = pred
-
+            if i > 200:
+                break
+            if i % 20 == 0:
+                print(f"======================================= {i} ===========================================")
         self.results = results
 
     def compute_known_facts(self):
