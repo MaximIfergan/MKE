@@ -81,58 +81,6 @@ PROMPT_TEMPLATES = {"birth_year":
                               }
                     }
 
-OCCUPATION_LANGS = {"Q33999":
-                        {"en": {"M": "actor", "F": "actress"},
-                         "fr": {"M": "acteur", "F": "actrice"},
-                         "he": {"M": "שחקן", "F": "שחקנית"},
-                         "ru": {"M": "", "F": ""},
-                         "ar": {"M": "", "F": ""}},
-                    "Q639669": {"en": {"M": "musician", "F": "musician"},
-                                "fr": {"M": "musicien", "F": "musicienne"},
-                                "he": {"M": "מוזיקאי", "F": "מוזיקאית"},
-                                "ru": {"M": "", "F": ""},
-                                "ar": {"M": "", "F": ""}},
-                    "Q82955": {"en": {"M": "politician", "F": "politician"},
-                               "fr": {"M": "politicien", "F": "politicienne"},
-                               "he": {"M": "פוליטיקאי", "F": "פוליטיקאית"},
-                               "ru": {"M": "", "F": ""},
-                               "ar": {"M": "", "F": ""}},
-                    "Q483501": {"en": {"M": "artist", "F": "artist"},
-                                "fr": {"M": "artiste", "F": "artiste"},
-                                "he": {"M": "אמן", "F": "אמנית"},
-                                "ru": {"M": "", "F": ""},
-                                "ar": {"M": "", "F": ""}},
-                    "Q1930187": {"en": {"M": "journalist", "F": "journalist"},
-                                 "fr": {"M": "journaliste", "F": "journaliste"},
-                                 "he": {"M": "עיתונאי", "F": "עיתונאית"},
-                                 "ru": {"M": "", "F": ""},
-                                 "ar": {"M": "", "F": ""}},
-                    "Q901": {"en": {"M": "scientist", "F": "scientist"},
-                             "fr": {"M": "scientifique", "F": "scientifique"},
-                             "he": {"M": "מדען", "F": "מדענית"},
-                             "ru": {"M": "", "F": ""},
-                             "ar": {"M": "", "F": ""}},
-                    "Q36180": {"en": {"M": "writer", "F": "writer"},
-                               "fr": {"M": "écrivain", "F": "écrivaine"},
-                               "he": {"M": "סופר", "F": "סופרת"},
-                               "ru": {"M": "", "F": ""},
-                               "ar": {"M": "", "F": ""}},
-                    "Q177220": {"en": {"M": "singer", "F": "singer"},
-                                "fr": {"M": "chanteur", "F": "chanteuse"},
-                                "he": {"M": "זמר", "F": "זמרת"},
-                                "ru": {"M": "", "F": ""},
-                                "ar": {"M": "", "F": ""}},
-                    "Q2066131": {"en": {"M": "athlete", "F": "athlete"},
-                                 "fr": {"M": "athlète", "F": "athlète"},
-                                 "he": {"M": "ספורטאי", "F": "ספורטאית"},
-                                 "ru": {"M": "", "F": ""},
-                                 "ar": {"M": "", "F": ""}},
-                    "Q753110": {"en": {"M": "songwriter", "F": "songwriter"},
-                                "fr": {"M": "auteur", "F": "autrice"},
-                                "he": {"M": "פזמונאי", "F": "פזמונאית"},
-                                "ru": {"M": "", "F": ""},
-                                "ar": {"M": "", "F": ""}}}
-
 CLIENT = Client()
 
 # LANGS = ["en", "fr", "ru", "he", "ar"]
@@ -278,13 +226,11 @@ class DatasetBuilder:
         self.append_birth_city_sample(sample)
 
     def append_sport_sample(self, entity):
-        if "birthYear" not in entity:
-            return -1
         gender = 'M' if entity["gender"].endswith("Q6581097") else "F"
         sport_qid = url_to_q_entity(entity["sportType"])
         obj_true = {lang: get_entity_name(sport_qid, lang) for lang in LANGS}
         sample = {"id": self.id_count,
-                  "subj": {"labels": {lang: entity[f"s_{lang}"] for lang in obj_true.keys()},
+                  "subj": {"labels": {lang: entity[f"o_{lang}"] for lang in obj_true.keys()},
                            "qid": url_to_q_entity(entity["entitiy"]),
                            "origin": entity["lang_code"],
                            "gender": gender},
@@ -292,9 +238,9 @@ class DatasetBuilder:
                           "qid": "P641"},
                   "obj_true": {"qid": sport_qid,
                                "label": obj_true},
-                  "prompt": {lang: PROMPT_TEMPLATES["birth_year"][lang][gender][0].format(entity[f"s_{lang}"])
+                  "prompt": {lang: PROMPT_TEMPLATES["birth_year"][lang][gender][0].format(entity[f"o_{lang}"])
                              for lang in obj_true.keys()},
-                  "paraphrase_prompts": {lang: [prompt.format(entity[f"s_{lang}"])
+                  "paraphrase_prompts": {lang: [prompt.format(entity[f"o_{lang}"])
                                                 for prompt in PROMPT_TEMPLATES["birth_year"][lang][gender][1:]]
                                          for lang in obj_true.keys()}}
         for lang in obj_true.keys():
@@ -375,22 +321,18 @@ class DatasetBuilder:
                 sample["target_true"] = {"label": str(int(sample["obj_true"]["label"]) + final)}
             elif sample["rel"]["label"] == "death_year":
                 sample["target_true"] = {"label": str(int(sample["obj_true"]["label"]) + final)}
-            elif sample["rel"]["label"] == "occupation":
-                rel_occupations = random.choices(list(OCCUPATION_LANGS.items()), k=2)
-                if rel_occupations[0][0] != sample["obj_true"]["qid"]:
-                    sample["target_true"] = {
-                        "label": OCCUPATION_LANGS[rel_occupations[0][0]][sample["lang"]][sample["subj"]["gender"]],
-                        "qid": rel_occupations[0][0]}
-                else:
-                    sample["target_true"] = {
-                        "label": OCCUPATION_LANGS[rel_occupations[1][0]][sample["lang"]][sample["subj"]["gender"]],
-                        "qid": rel_occupations[1][0]}
             elif sample["rel"]["label"] == "birth_city":
-                rel_occupations = random.choices(self.cities[sample["lang"]], k=2)
-                if rel_occupations[0] != sample["obj_true"]:
-                    sample["target_true"] = rel_occupations[0]
+                cities = random.choices(self.cities[sample["lang"]], k=2)
+                if cities[0] != sample["obj_true"]:
+                    sample["target_true"] = cities[0]
                 else:
-                    sample["target_true"] = rel_occupations[1]
+                    sample["target_true"] = cities[1]
+            elif sample["rel"]["label"] == "sport":
+                sports = random.choices(self.cities[sample["lang"]], k=2)
+                if sports[0] != sample["obj_true"]:
+                    sample["target_true"] = sports[0]
+                else:
+                    sample["target_true"] = sports[1]
 
     def save(self, path):
         with open(path, 'w', encoding='utf8') as file:

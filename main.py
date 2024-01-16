@@ -103,10 +103,10 @@ def exp_bloom2(model):
 
 
 if __name__ == "__main__":
+    # main()
     # exp_bloom()
     # edited_model = simple_editing_code()
     # exp_bloom2(edited_model)
-    # main()
     ke = KnowledgeEvaluator(model_name="bigscience/bloom-7b1", exp_name="first_try")
-    ke.eval(n_samples=200)
+    ke.eval(n_samples=1000)
     ke.save_results()

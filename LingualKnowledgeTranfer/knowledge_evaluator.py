@@ -8,11 +8,15 @@ from tqdm import tqdm
 import torch
 import pandas as pd
 import random
+
 random.seed(18)
 
 # ===============================      Global Variables:      ===============================
 
 DATASET_PATH = "Dataset/en-fr.json"
+FEW_SHOT = {"birth_year": {
+    "fr": "Abraham Lincoln est née en l'an 1809. Cristiano Ronaldo est née en l'an 1985. Albert Einstein est née en l'an 1879. ",
+    "en": "Abraham Lincoln was born in the year 1809. Cristiano Ronaldo was born in the year 1985. Albert Einstein was born in the year 1879. "}}
 
 
 # ===============================      Global functions:      ===============================
@@ -36,10 +40,12 @@ class KnowledgeEvaluator:
         random.shuffle(dataset)  # FOR DEBUG TODO: delete
         print_title(f"Start {self.exp_name} evaluation")
         results = []
-        for i, sample in tqdm(enumerate(dataset)):
+        for i, sample in tqdm(enumerate(dataset), total=len(dataset)):
+            if sample["rel"]["label"] != "birth_year":
+                continue
             sample_id = sample["id"]
             for lang in sample["prompt"].keys():
-                prompt = sample["prompt"][lang]
+                prompt = FEW_SHOT["birth_year"][lang] + sample["prompt"][lang]
                 gold = sample["obj_true"]["label"] if 'year' in sample["rel"]["label"] \
                     else sample["obj_true"]["label"][lang]
                 batch = self.tok(prompt, return_tensors='pt', padding=True, max_length=30)
@@ -53,8 +59,8 @@ class KnowledgeEvaluator:
         final_results = pd.DataFrame(results, columns=["id", "lang", "pred", "gold"])
         eval_result = evaluate_metrics(final_results["gold"], final_results["pred"])
         print(f"{self.exp_name} evaluation results: EM {eval_result['exact_match']},  F1: {eval_result['f1']}")
-        final_results["EM"] = eval_result['f1_scores']
-        final_results["F1"] = eval_result['exact_match_scores']
+        final_results["F1"] = eval_result['f1_scores']
+        final_results["EM"] = eval_result['exact_match_scores']
         self.eval_results = final_results
 
     def save_results(self):
