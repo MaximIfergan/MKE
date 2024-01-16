@@ -11,6 +11,7 @@ from util import load_json_file, print_title, evaluate_metrics
 
 DATASET_PATH = "Dataset/en-fr.json"
 
+
 # ====================================      Class:      ====================================
 
 class KnowledgeEditor():
@@ -60,9 +61,7 @@ def old():
 
     # model = AutoModelForCausalLM.from_pretrained(model_name).to('cuda:0')
 
-
     for p in correct_prompts:
-
         batch = tokenizer(p, return_tensors='pt')
 
         # pre_edit_outputs = model.generate(

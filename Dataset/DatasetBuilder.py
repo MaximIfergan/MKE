@@ -94,7 +94,7 @@ FEW_SHOT = {"birth_year": {
         "fr": "Abraham Lincoln est née en l'an 1809. Cristiano Ronaldo est née en l'an 1985. ",
         "en": "Abraham Lincoln was born in the year 1809. Cristiano Ronaldo was born in the year 1985. "},
     "death_year": {
-        "fr": "Abraham Lincoln est mort en l'an 1809. Albert Einstein est mort en l'an 1955. ",
+        "fr": "Abraham Lincoln est mort en l'an 1865. Albert Einstein est mort en l'an 1955. ",
         "en": "Abraham Lincoln died in the year 1865. Albert Einstein died in the year 1955. "},
     "birth_city": {
         "fr": "Albert Einstein was born in the city of Ulm. Cristiano Ronaldo was born in the city of Funchal. ",
