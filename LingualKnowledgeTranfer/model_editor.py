@@ -51,8 +51,9 @@ class KnowledgeEditor():
         results = dict()
         for i, sample in tqdm(enumerate(self.known_facts), total=len(self.known_facts)):
             sample_id, sample_lang = sample
+            res_key = sample_id + "_" + sample_lang
             dataset_sample = self.dataset[sample_id - 1]
-            results[sample] = dict()
+            results[res_key] = dict()
             ground_truth = dataset_sample["obj_true"]["label"] if 'year' in dataset_sample["rel"]["label"] \
                 else dataset_sample["obj_true"]["label"][sample_lang]
             target_new = dataset_sample["target_true"]["label"] if 'year' in dataset_sample["rel"]["label"] \
@@ -62,7 +63,7 @@ class KnowledgeEditor():
                 prompts=dataset_sample["prompt"][sample_lang],
                 ground_truth=ground_truth,
                 target_new=target_new,
-                subject=dataset_sample['subj']["labels"][sample_lang],
+                subject=dataset_sample['subj']["labels"][sample_lang],  # TODO change to 'label' in dataset
                 keep_original_weight=False
             )
 
@@ -75,8 +76,7 @@ class KnowledgeEditor():
                     max_new_tokens=5
                 )
                 pred = tokenizer.decode(model_output.detach().cpu().numpy().tolist()[0])[len(prompt):]
-                results[sample][lang] = pred
-
+                results[res_key][lang] = pred
             break
 
         self.results = results
