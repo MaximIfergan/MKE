@@ -112,6 +112,6 @@ if __name__ == "__main__":
     # # Fewshot_Fix evaluation results: EM 1.3332846288720046,  F1: 3.4904284137188792
     # ke.eval()
     # ke.save_results()
-    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="first_try", eval_results_path="Fewshot_Fix_eval_res.csv")
+    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="all", eval_results_path="Fewshot_Fix_eval_res.csv")
     ke.edit()
     ke.save_results()
