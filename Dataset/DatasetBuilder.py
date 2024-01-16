@@ -90,6 +90,20 @@ LANG2QID = {"en": "Q1860", "fr": "Q150", "he": "Q9288", "ar": "Q13955", "ru": "Q
 
 RAW_DATA_PATH = "Dataset/raw_data.json"
 
+FEW_SHOT = {"birth_year": {
+        "fr": "Abraham Lincoln est née en l'an 1809. Cristiano Ronaldo est née en l'an 1985. ",
+        "en": "Abraham Lincoln was born in the year 1809. Cristiano Ronaldo was born in the year 1985. "},
+    "death_year": {
+        "fr": "Abraham Lincoln est mort en l'an 1809. Albert Einstein est mort en l'an 1955. ",
+        "en": "Abraham Lincoln died in the year 1865. Albert Einstein died in the year 1955. "},
+    "birth_city": {
+        "fr": "Albert Einstein was born in the city of Ulm. Cristiano Ronaldo was born in the city of Funchal. ",
+        "en": "Albert Einstein est né dans une ville nommée Ulm. Cristiano Ronaldo est né dans une ville Funchal. "},
+    "sport": {
+        "fr": "Rafael Nadal joue professionnellement au sport du tennis. Cristiano Ronaldo joue professionnellement au sport du football. ",
+        "en": "Abraham Lincoln professionally plays the sport of tennis. Cristiano Ronaldo professionally plays the sport of association football. "}
+}
+
 ENTITIES2LABELS_PATH = "Dataset/ENTITIES2LABELS.json"
 
 with open(ENTITIES2LABELS_PATH, 'r') as file:
@@ -238,10 +252,10 @@ class DatasetBuilder:
                           "qid": "P641"},
                   "obj_true": {"qid": sport_qid,
                                "label": obj_true},
-                  "prompt": {lang: PROMPT_TEMPLATES["birth_year"][lang][gender][0].format(entity[f"o_{lang}"])
+                  "prompt": {lang: PROMPT_TEMPLATES["sport"][lang][gender][0].format(entity[f"o_{lang}"])
                              for lang in obj_true.keys()},
                   "paraphrase_prompts": {lang: [prompt.format(entity[f"o_{lang}"])
-                                                for prompt in PROMPT_TEMPLATES["birth_year"][lang][gender][1:]]
+                                                for prompt in PROMPT_TEMPLATES["sport"][lang][gender][1:]]
                                          for lang in obj_true.keys()}}
         for lang in obj_true.keys():
             self.sports[lang].add(obj_true[lang])

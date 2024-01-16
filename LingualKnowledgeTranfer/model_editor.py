@@ -3,13 +3,28 @@ from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
 from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
-
+from util import load_json_file, print_title, evaluate_metrics
 
 # ===============================      Global Variables:      ===============================
 
 # ===============================      Global functions:      ===============================
 
+DATASET_PATH = "Dataset/en-fr.json"
+
 # ====================================      Class:      ====================================
+
+class KnowledgeEditor():
+
+    def __init__(self, model_name, eval_results_path, dataset_path=DATASET_PATH, exp_name=""):
+        self.model_name = model_name
+        self.exp_name = exp_name
+        self.dataset = load_json_file(dataset_path)
+        self.eval_results = load_json_file(eval_results_path)
+        self.known_facts = None
+
+    def edit(self, n_samples=None, fewshot=False):
+        pass
+
 
 def old():
     hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/gpt-j-6B.yaml')
