@@ -54,9 +54,9 @@ class KnowledgeEditor():
             dataset_sample = self.dataset[sample_id - 1]
             results[sample] = dict()
             ground_truth = dataset_sample["obj_true"]["label"] if 'year' in dataset_sample["rel"]["label"] \
-                else sample["obj_true"]["label"][sample_lang]
+                else dataset_sample["obj_true"]["label"][sample_lang]
             target_new = dataset_sample["target_true"]["label"] if 'year' in dataset_sample["rel"]["label"] \
-                else sample["target_true"]["label"][sample_lang]
+                else dataset_sample["target_true"]["label"][sample_lang]
             editor = BaseEditor.from_hparams(hparams)
             metrics, edited_model, _ = editor.edit(
                 prompts=dataset_sample["prompt"][sample_lang],
