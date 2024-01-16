@@ -219,12 +219,14 @@ class DatasetBuilder:
         # random.shuffle(self.raw_data)  # TODO: For debug
         # self.raw_data = self.raw_data[:20]  # TODO: For debug
         self.id_count = 1
-        self.cities = {lang: set() for lang in LANGS}
-        self.sports = {lang: set() for lang in LANGS}
+        self.cities = {}
+        self.sports = {}
 
     def preprocess(self):
         self.construct_prompts()
-        # self.assign_target_labels()
+        self.sports_qid = list(self.sports.keys())
+        self.cities_qid = list(self.cities.keys())
+        self.assign_target_labels()
 
     def construct_prompts(self):
         for sample in self.raw_data:
@@ -257,8 +259,7 @@ class DatasetBuilder:
                   "paraphrase_prompts": {lang: [prompt.format(entity[f"o_{lang}"])
                                                 for prompt in PROMPT_TEMPLATES["sport"][lang][gender][1:]]
                                          for lang in obj_true.keys()}}
-        for lang in obj_true.keys():
-            self.sports[lang].add(obj_true[lang])
+        self.sports[sport_qid] = obj_true
         self.data.append(sample)
         self.id_count += 1
 
@@ -320,33 +321,32 @@ class DatasetBuilder:
                   "paraphrase_prompts": {lang: [prompt.format(entity[f"s_{lang}"])
                                                 for prompt in PROMPT_TEMPLATES["birth_city"][lang][gender][1:]]
                                          for lang in obj_true.keys()}}
-        for lang in obj_true.keys():
-            self.cities[lang].add(obj_true[lang]) # TODO: Change
+        self.cities[city_qid] = obj_true
         self.data.append(sample)
         self.id_count += 1
 
     def assign_target_labels(self):
 
-        for sample in self.data:
+        for i in range(len(self.data)):
             diff = random.randint(1, 30)
             sign = random.randint(0, 1)
             final = diff if sign else -diff
-            if sample["rel"]["label"] == "birth_year":
-                sample["target_true"] = {"label": str(int(sample["obj_true"]["label"]) + final)}
-            elif sample["rel"]["label"] == "death_year":
-                sample["target_true"] = {"label": str(int(sample["obj_true"]["label"]) + final)}
-            elif sample["rel"]["label"] == "birth_city":
-                cities = random.choices(self.cities[sample["lang"]], k=2)
-                if cities[0] != sample["obj_true"]:
-                    sample["target_true"] = cities[0]
+            if self.data[i]["rel"]["label"] == "birth_year":
+                self.data[i]["target_true"] = {"label": str(int(self.data[i]["obj_true"]["label"]) + final)}
+            elif self.data[i]["rel"]["label"] == "death_year":
+                self.data[i]["target_true"] = {"label": str(int(self.data[i]["obj_true"]["label"]) + final)}
+            elif self.data[i]["rel"]["label"] == "birth_city":
+                r_cities = random.choices(self.cities_qid, k=2)
+                if r_cities[0] != self.data[i]["obj_true"]['qid']:
+                    self.data[i]["target_true"] = {"qid": r_cities[0], "label": self.cities[r_cities[0]]}
                 else:
-                    sample["target_true"] = cities[1]
-            elif sample["rel"]["label"] == "sport":
-                sports = random.choices(self.cities[sample["lang"]], k=2)
-                if sports[0] != sample["obj_true"]:
-                    sample["target_true"] = sports[0]
+                    self.data[i]["target_true"] = {"qid": r_cities[1], "label": self.cities[r_cities[1]]}
+            elif self.data[i]["rel"]["label"] == "sport":
+                r_sports = random.choices(self.sports_qid, k=2)
+                if r_sports[0] != self.data[i]["obj_true"]['qid']:
+                    self.data[i]["target_true"] = {"qid": r_sports[0], "label": self.sports[r_sports[0]]}
                 else:
-                    sample["target_true"] = sports[1]
+                    self.data[i]["target_true"] = {"qid": r_sports[0], "label": self.sports[r_sports[0]]}
 
     def save(self, path):
         with open(path, 'w', encoding='utf8') as file:
