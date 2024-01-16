@@ -46,7 +46,7 @@ class KnowledgeEvaluator:
                 model_output = self.model.generate(
                     input_ids=batch['input_ids'].to('cuda:0'),
                     attention_mask=batch['attention_mask'].to('cuda:0'),
-                    max_new_tokens=3
+                    max_new_tokens=5
                 )
                 pred = self.tok.decode(model_output.detach().cpu().numpy().tolist()[0])[len(prompt):]
                 results.append([sample_id, lang, str(pred), str(gold)])

@@ -108,5 +108,5 @@ if __name__ == "__main__":
     # exp_bloom2(edited_model)
     # main()
     ke = KnowledgeEvaluator(model_name="bigscience/bloom-7b1", exp_name="first_try")
-    ke.eval(n_samples=20)
+    ke.eval(n_samples=200)
     ke.save_results()
