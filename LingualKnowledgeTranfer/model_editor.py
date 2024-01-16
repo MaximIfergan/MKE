@@ -62,7 +62,7 @@ class KnowledgeEditor():
                 prompts=dataset_sample["prompt"][sample_lang],
                 ground_truth=ground_truth,
                 target_new=target_new,
-                subject=dataset_sample['subj']["label"][sample_lang],
+                subject=dataset_sample['subj']["labels"][sample_lang],
                 keep_original_weight=False
             )
 
