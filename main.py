@@ -5,7 +5,7 @@ from EasyEdit.easyeditor import ROMEHyperParams
 from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
 import torch
-import LingualKnowledgeTranfer.knowledge_evaluator as KE
+from LingualKnowledgeTranfer.knowledge_evaluator import KnowledgeEvaluator
 
 def main():
     DatasetBuilder.main()
@@ -107,6 +107,6 @@ if __name__ == "__main__":
     # edited_model = simple_editing_code()
     # exp_bloom2(edited_model)
     # main()
-    ke = KE.KnowledgeEvaluator(exp_name="first_try")
+    ke = KnowledgeEvaluator(model_name="bigscience/bloom-7b1", exp_name="first_try")
     ke.eval(n_samples=20)
     ke.save_results()

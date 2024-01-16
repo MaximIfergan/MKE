@@ -21,7 +21,7 @@ DATASET_PATH = "Dataset/en-fr.json"
 
 class KnowledgeEvaluator:
 
-    def __int__(self, model_name, dataset_path=DATASET_PATH, exp_name=""):
+    def __init__(self, model_name, dataset_path=DATASET_PATH, exp_name=""):
         self.tok = AutoTokenizer.from_pretrained(model_name, use_fast=False, padding_side="left",
                                                  trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True, torch_dtype=torch.float16,
