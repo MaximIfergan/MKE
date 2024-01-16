@@ -48,9 +48,8 @@ class KnowledgeEvaluator:
                     attention_mask=batch['attention_mask'].to('cuda:0'),
                     max_new_tokens=3
                 )
-                pred = self.tok.decode(model_output.detach().cpu().numpy().tolist()[0])
-                print(pred)
-                results.append([sample_id, lang, pred, gold])
+                pred = self.tok.decode(model_output.detach().cpu().numpy().tolist()[0])[len(prompt):]
+                results.append([sample_id, lang, str(pred), gold])
         final_results = pd.DataFrame(results, columns=["id", "lang", "pred", "gold"])
         eval_result = evaluate_metrics(final_results["gold"], final_results["pred"])
         print(f"{self.exp_name} evaluation results: EM {eval_result['exact_match']},  F1: {eval_result['f1']}")
