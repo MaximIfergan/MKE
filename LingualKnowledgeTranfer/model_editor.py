@@ -1,5 +1,7 @@
 import json
 
+import pandas as pd
+
 import EasyEdit
 from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
@@ -39,7 +41,7 @@ class KnowledgeEditor():
         self.model_name = model_name
         self.exp_name = exp_name
         self.dataset = load_json_file(dataset_path)
-        self.eval_results = load_json_file(eval_results_path)
+        self.eval_results = pd.read_csv(eval_results_path)
         self.compute_known_facts()
 
     def edit(self, n_samples=None, fewshot=False):
