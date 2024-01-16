@@ -113,3 +113,5 @@ if __name__ == "__main__":
     # ke.eval()
     # ke.save_results()
     ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="first_try", eval_results_path="Fewshot_Fix_eval_res.csv")
+    ke.edit()
+    ke.save_results()
