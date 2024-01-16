@@ -8,6 +8,7 @@ from lodstorage.csv import CSV
 from wikidata.client import Client
 import sys
 import random
+from util import load_json_file
 
 random.seed(18)
 
@@ -204,17 +205,6 @@ def url_to_q_entity(url):
         A string containing the Wikidata entity ID (Q-number), or None if the URL is invalid.
       """
     return url.split("/")[-1]
-
-
-def load_json_file(output_file):
-    """Reads a JSON file where each line is a dictionary and returns a list of those dictionaries."""
-
-    with open(output_file, "r") as infile:
-        data = []
-        for line in infile:
-            dictionary = json.loads(line)
-            data.append(dictionary)
-    return data
 
 
 def save_entities_labels():

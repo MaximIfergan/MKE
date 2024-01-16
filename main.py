@@ -6,6 +6,7 @@ from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
 import torch
 
+
 def main():
     DatasetBuilder.main()
 
@@ -62,6 +63,7 @@ def simple_editing_code():
         # print('Post-Edit Outputs: ', [tokenizer.decode(x) for x in post_edit_outputs.detach().cpu().numpy().tolist()])
     return edited_model
 
+
 def exp_bloom():
 
     prompts = ["Abraham Lincoln est née en l'an",
@@ -79,6 +81,7 @@ def exp_bloom():
             max_new_tokens=3
         )
         print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
+
 
 def exp_bloom2(model):
 
