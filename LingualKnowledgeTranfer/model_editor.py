@@ -1,7 +1,5 @@
 import json
-
 import pandas as pd
-
 import EasyEdit
 from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
@@ -77,7 +75,6 @@ class KnowledgeEditor():
                 )
                 pred = tokenizer.decode(model_output.detach().cpu().numpy().tolist()[0])[len(prompt):]
                 results[res_key][lang] = pred
-            break
 
         self.results = results
 
