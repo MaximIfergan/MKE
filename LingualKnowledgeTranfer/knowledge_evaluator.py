@@ -41,7 +41,7 @@ class KnowledgeEvaluator:
             for lang in sample["prompt"].keys():
                 prompt = sample["prompt"][lang]
                 gold = sample["obj_true"]["label"] if 'year' in sample["rel"]["label"] \
-                    else sample["obj_true"][lang]["label"]
+                    else sample["obj_true"]["label"][lang]
                 batch = self.tok(prompt, return_tensors='pt', padding=True, max_length=30)
                 model_output = self.model.generate(
                     input_ids=batch['input_ids'].to('cuda:0'),
