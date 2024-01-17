@@ -51,6 +51,7 @@ class KnowledgeEditor():
             if i % 20 == 0:
                 print(f"======================================= {i} ===========================================")
             if i % 200 == 0:
+                self.results = results
                 with open(f"{self.exp_name}.json", "w") as outfile:
                     json.dump(self.results, outfile)
             sample_id, sample_lang = sample
