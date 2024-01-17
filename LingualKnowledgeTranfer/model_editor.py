@@ -42,14 +42,18 @@ class KnowledgeEditor():
         self.eval_results = pd.read_csv(eval_results_path)
         self.compute_known_facts()
 
-    def edit(self, n_samples=None, fewshot=False):
+    def edit(self, n_samples=None, fewshot=False, res_path=None):
         hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False, padding_side="left",
                                                   trust_remote_code=True)
-        results = dict()
+        results = dict() if not res_path else load_json_file(res_path)[0]
         for i, sample in tqdm(enumerate(self.known_facts), total=len(self.known_facts)):
+            if i % 20 == 0:
+                print(f"======================================= {i} ===========================================")
             sample_id, sample_lang = sample
             res_key = str(sample_id) + "_" + sample_lang
+            if res_key in results:
+                continue
             dataset_sample = self.dataset[sample_id - 1]
             results[res_key] = dict()
             ground_truth = dataset_sample["obj_true"]["label"] if 'year' in dataset_sample["rel"]["label"] \
@@ -75,10 +79,6 @@ class KnowledgeEditor():
                 )
                 pred = tokenizer.decode(model_output.detach().cpu().numpy().tolist()[0])[len(prompt):]
                 results[res_key][lang] = pred
-            if i > 200:
-                break
-            if i % 20 == 0:
-                print(f"======================================= {i} ===========================================")
         self.results = results
 
     def compute_known_facts(self):
