@@ -12,6 +12,10 @@ from util import load_json_file
 
 random.seed(18)
 
+# TODO: Change the sport query to instance of Q31629
+# TODO: Change the word 'labels' with 'label'
+# TODO: Demand that every number is a str
+
 # ===============================      Global Variables:      ===============================
 
 PROMPT_TEMPLATES = {"birth_year":

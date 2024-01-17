@@ -50,6 +50,9 @@ class KnowledgeEditor():
         for i, sample in tqdm(enumerate(self.known_facts), total=len(self.known_facts)):
             if i % 20 == 0:
                 print(f"======================================= {i} ===========================================")
+            if i % 200 == 0:
+                with open(f"{self.exp_name}.json", "w") as outfile:
+                    json.dump(self.results, outfile)
             sample_id, sample_lang = sample
             res_key = str(sample_id) + "_" + sample_lang
             if res_key in results:
