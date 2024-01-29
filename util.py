@@ -83,6 +83,17 @@ def evaluate_metrics(gold_answers, predictions):
     return {'exact_match': exact_match, 'f1': f1, 'f1_scores': f1_scores, 'exact_match_scores': exact_match_scores}
 
 
+def get_prefix(input_string):
+    # Find the index of the first '.' character in the string
+    dot_index = input_string.find('.')
+
+    # If '.' is not found, return the entire string
+    if dot_index == -1:
+        return input_string
+
+    # Otherwise, return the prefix of the string until the first '.'
+    return input_string[:dot_index]
+
 if __name__ == "__main__":
     print_title("Global Vars")
     print_title("Global functions")
