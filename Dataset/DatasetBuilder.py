@@ -42,7 +42,7 @@ QID2LAND = {"Q1860": "en", "Q150": "fr", "Q9288": "he", "Q13955": "ar", "Q7737":
 
 RAW_DATA_PATH = "Dataset/mke_data.json"
 
-FEW_SHOT = load_json_file("Dataset/fewshots.json")
+FEW_SHOT = load_json_file("Dataset/fewshots.json")[0]
 
 ENTITIES2LABELS_PATH = "Dataset/ENTITIES2LABELS.json"
 

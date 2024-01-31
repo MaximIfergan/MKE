@@ -14,7 +14,7 @@ random.seed(18)
 
 # ===============================      Global Variables:      ===============================
 
-DATASET_PATH = "Dataset/en-fr.json"
+DATASET_PATH = "Dataset/mke_data.json"
 F1_SUCCESS = 0.4
 
 
@@ -118,11 +118,12 @@ class KnowledgeEvaluator:
         for i, sample in tqdm(enumerate(dataset), total=len(dataset)):
 
             sample_id = sample["id"]
-            sample_langs = sample["prompt"].keys()
+            sample_langs = list(sample["prompt"].keys())
             sample_prompts = [sample["prompt"][lang] for lang in sample_langs]
 
             if fewshot:
-                sample_prompts = [FEW_SHOT[sample["rel"]["label"]]["prompt"] + prompt for prompt in sample_prompts]
+                sample_prompts = [FEW_SHOT[sample["rel"]["label"]][sample_langs[i]]["prompt"] + sample_prompts[i] for i
+                                  in range(len(sample_prompts))]
             if space:
                 sample_prompts = [prompt + " " for prompt in sample_prompts]
 
