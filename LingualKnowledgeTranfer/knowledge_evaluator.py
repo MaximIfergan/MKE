@@ -122,7 +122,7 @@ class KnowledgeEvaluator:
             sample_prompts = [sample["prompt"][lang] for lang in sample_langs]
 
             if fewshot:
-                sample_prompts = [FEW_SHOT[sample["rel"]["label"]]  + prompt for prompt in sample_prompts]
+                sample_prompts = [FEW_SHOT[sample["rel"]["label"]]["prompt"] + prompt for prompt in sample_prompts]
             if space:
                 sample_prompts = [prompt + " " for prompt in sample_prompts]
 
