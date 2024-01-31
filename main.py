@@ -1,7 +1,7 @@
 import Dataset.DatasetBuilder as DatasetBuilder
 import util
 import LingualKnowledgeTranfer.knowledge_evaluator
-# import LingualKnowledgeTranfer.model_editor
+import LingualKnowledgeTranfer.model_editor
 import json
 
 def small_data_analysis():
