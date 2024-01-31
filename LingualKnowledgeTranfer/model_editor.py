@@ -170,7 +170,9 @@ class KnowledgeEditor():
             # locality:
 
             for lang in dataset_sample["prompt"].keys():
-                loc_exp = random.choice([x for x in self.locality_prompts[lang] if int(x[0]) != int(sample_id)])
+                print(self.locality_prompts[lang])
+                lst = [x for x in self.locality_prompts[lang] if int(x[0]) != int(sample_id)]
+                loc_exp = random.choice(lst)
                 sample_eval += [(f"{lang}_loc", loc_exp[1], loc_exp[2])]
 
             batch_eval = [sample_eval[i:i + bs] for i in range(0, len(sample_eval), bs)]
