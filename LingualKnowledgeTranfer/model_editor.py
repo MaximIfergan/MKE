@@ -170,9 +170,7 @@ class KnowledgeEditor():
             # locality:
 
             for lang in dataset_sample["prompt"].keys():
-                print(self.locality_prompts[lang])
-                lst = [x for x in self.locality_prompts[lang] if int(x[0]) != int(sample_id)]
-                loc_exp = random.choice(lst)
+                loc_exp = random.choice([x for x in self.locality_prompts[lang] if int(x[0]) != int(sample_id)])
                 sample_eval += [(f"{lang}_loc", loc_exp[1], loc_exp[2])]
 
             batch_eval = [sample_eval[i:i + bs] for i in range(0, len(sample_eval), bs)]
@@ -212,7 +210,7 @@ class KnowledgeEditor():
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = {tuple(x) for x in known_ids.values}
 
-    def locality_prompts(self, size_per_lang=200):
+    def build_locality_prompts(self, size_per_lang=200):
         df_suc = self.eval_results[self.eval_results['F1'] > F1_SUCCESS].sample(frac=1)
         locality_prompts = {lang: [] for lang in LANGS}
         for ind in df_suc.index:
