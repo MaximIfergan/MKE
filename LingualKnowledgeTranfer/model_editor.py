@@ -13,7 +13,7 @@ random.seed(18)
 
 # ===============================      Global Variables:      ===============================
 
-DATASET_PATH = "Dataset/en-fr.json"
+DATASET_PATH = "Dataset/mke_data.json"
 F1_SUCCESS = 0.4
 
 # ===============================      Global functions:      ===============================
