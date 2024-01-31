@@ -131,12 +131,10 @@ class KnowledgeEditor():
 
             # === init params:
             sample_id, sample_lang = sample
-            print(sample)
             res_key = str(sample_id) + "_" + sample_lang
             if res_key in results:
                 continue
             dataset_sample = self.dataset[sample_id - 1]
-            print(dataset_sample)
             results[res_key] = {"prompt": None, "gen": dict(), "loc": dict()}
 
             # === edit:
@@ -172,8 +170,8 @@ class KnowledgeEditor():
             # locality:
 
             for lang in dataset_sample["prompt"].keys():
-                loc_exp = random.choice([x for x in self.locality_prompts[lang] if x[0] != sample_id])
-                sample_eval += [(f"{lang}_loc", loc_exp[0], loc_exp[1])]
+                loc_exp = random.choice([x for x in self.locality_prompts[lang] if int(x[0]) != int(sample_id)])
+                sample_eval += [(f"{lang}_loc", loc_exp[1], loc_exp[2])]
 
             batch_eval = [sample_eval[i:i + bs] for i in range(0, len(sample_eval), bs)]
 
@@ -202,8 +200,8 @@ class KnowledgeEditor():
                         results[res_key]["gen"][s_lang].append({"pred": text_output[j],
                                                                 "gold": dataset_sample["obj_true"]["label"][s_lang]})
                     if "loc" == s_type:
-                        results[res_key]["loc"][s_lang] = {"pred": batch[j][2],
-                                                           "gold": text_output[j]}
+                        results[res_key]["loc"][s_lang] = {"pred": text_output[j],
+                                                           "gold": batch[j][2]}
 
         self.results = results
 
@@ -222,7 +220,7 @@ class KnowledgeEditor():
                 continue
             else:
                 dataset_sample = self.dataset[s_id - 1]
-                locality_prompts[s_lang].append((dataset_sample["prompt"][s_lang], df_suc['pred'][ind]))
+                locality_prompts[s_lang].append((s_id, dataset_sample["prompt"][s_lang], df_suc['pred'][ind]))
         self.locality_prompts = locality_prompts
         # with open(f"{self.exp_name}_locality_prompts.json", "w") as outfile:
         #     json.dump(locality_prompts, outfile)
