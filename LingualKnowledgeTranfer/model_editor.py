@@ -113,6 +113,7 @@ class KnowledgeEditor():
         self.dataset = load_json_file(dataset_path)
         self.eval_results = pd.read_csv(eval_results_path)
         self.compute_known_facts()
+        self.build_locality_prompts()
 
     def edit(self, bs=1, n_samples=None, fewshot=False, res_path=None):
 
