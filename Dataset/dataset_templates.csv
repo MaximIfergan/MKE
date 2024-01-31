@@ -1,0 +1,43 @@
+lang/relation,birth_year,birth_city,death_year,sport_type,architect_by,geo_continent,tourist_attraction_country
+en_m_1,{} was born in the year,{} was born in the city of,{} died in the year,{} professionally plays the sport of,{} was designed by an architect named,The {} is located in the continent of,nan
+en_m_2,The birth year of {} is,The birth city of {} is,The death year of {} is,The sport that {} is associated with is,The name of the architect who designed The {} is,The {} is a part of the continent of,nan
+en_m_3,{}'s birth took place in the year,The birthplace of {} is the city of,{}'s death took place in the year,{} participates in the sport of, The architect of The {} was,The continent in which the {} is part of is,nan
+en_f_1,{} was born in the year,{} was born in the city of,{} died in the year,{} professionally plays the sport of,{} was designed by an architect named,The {} is located in the continent of,nan
+en_f_2,The birth year of {} is,The birth city of {} is,The death year of {} is,The sport that {} is associated with is,The name of the architect who designed The {} is,The {} is a part of the continent of,nan
+en_f_3,{}'s birth took place in the year,The birthplace of {} is the city of,{}'s death took place in the year,{} participates in the sport of,The architect of The {} was,The continent in which the {} is part of is,nan
+fr_m_1,{} est né en l'an,{} est né dans une ville nommée,{} est mort en l'an,{} joue professionnellement au sport du,Le {} a été conçu par l'architecte,La {} est située en continent du,nan
+fr_m_2,L'année de naissance de {} est,La ville natale de {} était,L'année de la mort de {} est,Le sport avec lequel {} est associé est le,Le {} est l'œuvre magistrale de l'architecte,La {} fait partie continent du,nan
+fr_m_3,La naissance de {} a eu lieu en l'an,La ville natale de {} se trouvait à,La mort de {} a eu lieu en l'an,{} participe au sport du,Le {} porte la signature de l'architecte,La célèbre {} trône fièrement sur le continent du,nan
+fr_f_1,{} est née en l'an,{} est née dans une ville nommée,{} est née en l'an,{} joue professionnellement au sport du,Le {} a été conçu par l'architecte,La {} est située en continent du,nan
+fr_f_2,L'année de naissance de {} est,La ville natale de {} était,L'année de la mort de {} est,Le sport auquel {} est associée est le,Le {} est l'œuvre magistrale de l'architecte,La {} fait partie continent du,nan
+fr_f_3,La naissance de {} a eu lieu en l'an,La ville natale de {} se trouvait à,La mort de {} a eu lieu en l'an,{} participe au sport du,Le {} porte la signature de l'architecte,La célèbre {} trône fièrement sur le continent du,nan
+ru_m_1,{} родился в году,{} родился в городе,{} умер в году,{} профессионально занимается,{} был спроектирован архитектором,{} расположена в,nan
+ru_m_2,Год рождения {} он,Город рождения {} он,Год смерти {}а -,"Вид спорта, с которым ассоциируется {}, -",Архитектор {} -,{} - часть,nan
+ru_m_3,{} год рождения был в,место рождения {} ето город,{} год смерти был в,{} участвует в спорте,{} - творение архитектора,{} возвышается над бескрайними просторами,nan
+ru_f_1,{} родилась в году,{} родилась в городе,{} умерла в году,{} профессионально занимается,{} был спроектирован архитектором,{} расположена в,nan
+ru_f_2,Год рождения {} он,Город рождения {} он,Год смерти {} -,"Вид спорта, с которым ассоциируется {}, -",Архитектор {} -,{} - часть,nan
+ru_f_3,{} год рождения был в,место рождения {} ето город,{} год смерти был в,{} участвует в спорте,{} - творение архитектора,{} возвышается над бескрайними просторами,nan
+he_m_1,{} נולד בשנת,{} נולד בעיר,מת בשנת {},{} משחק בענף הספורט,{} עוצב על ידי האדריכל ששמו,{} ממוקם ביבשת של,nan
+he_m_2,שנת הלידה של {} היא,העיר בה נולד {} היא,שנת מותו של {} היא,ענף הספורט בו משתתף {} הוא,שמו של האדריכל שעיצב את {} הוא,{} נמצא ביבשת של,nan
+he_m_3,לידת {} התרחשה בשנת,מקום הלידה של {} הוא בעיר,מותו של {} התרחש בשנת,{} מקושר לענף הספורט,האדריכל של {} הוא,היבשת אשר {} הנה חלק ממנה היא,nan
+he_f_1,{} נולדה בשנת,{} נולדה בעיר,מתה בשנת {},{} משחקת בענף הספורט,{} עוצב על ידי האדריכלית ששמה,{} ממוקם ביבשת של,nan
+he_f_2,שנת הלידה של {} היא,העיר בה נולדה {} היא,שנת מותה של {} היא,ענף הספורט בו משתתפת {} הוא,שמה של האדריכלית שעיצבה את {} הוא,{} נמצא ביבשת של,nan
+he_f_3,לידת {} התרחשה בשנת,מקום הלידה של {} הוא בעיר,מותה של {} התרחש בשנת,{} מקושרת לענף הספורט,האדריכלית של {} היא,היבשת אשר {} הנה חלק ממנה היא,nan
+ar_m_1,ولد {} عام,ولد {} في مدينة,توفي {} عام,{} يلعب بشكل احترافي في رياضة,{} صممهُ المهندس المعماري,تقع {} في قارة,nan
+ar_m_2,سنة ميلاد {} هي,مدينة ميلاد {} هي,سنة وفاة {} هي,الرياضة التي يرتبط بها {} هي,المهندس المعماري ل{} هو,{} جزء من قارة,nan
+ar_m_3,تمت ولادة {} في عام,تمت ولادة باخ في مدينة,حدثت وفاة {} في عام,{} يشارك في رياضة,{} تحفة معمارية تحمل بصمة المهندس المعماري,{}، ذا الشموخ الباسق، يزين منظر قارة,nan
+ar_f_1,ولدت {} عام,ولدت {} في مدينة,توفيت {} عام,{} ميرزا بشكل احترافي في رياضة,{} صممهُ المهندس المعماري,تقع {} في قارة,nan
+ar_f_2,سنة ميلاد {} هي,مدينة ميلاد {} هي,سنة وفاة {} هي,الرياضة التي ترتبط بها {} هي,المهندس المعماري ل{} هو,{} جزء من قارة,nan
+ar_f_3,تمت ولادة {} في عام,تمت ولادة باخ في مدينة,حدثت وفاة {} في عام,{} تشارك في رياضة,{} تحفة معمارية تحمل بصمة المهندس المعماري,{}، ذا الشموخ الباسق، يزين منظر قارة,nan
+es_m_1,{} nació en el año,{} nació en la ciudad de,{} falleció en el año,{} juega profesionalmente al,El {} fue diseñado por el arquitecto,La {} se encuentra en África,nan
+es_m_2,El año de nacimiento de {} es,La ciudad natal de {} es,El año de fallecimiento de {} es,El deporte con el que se asocia a {} es el,El {} es una obra maestra del aclamado arquitecto,La {} es parte del continente,nan
+es_m_3,El nacimiento de {} tuvo lugar en,El lugar de nacimiento de {} es la ciudad de,La muerte de {} tuvo lugar en,{} participa en el deporte del,"Con su diseño innovador, el {} lleva la firma del arquitecto",La {} es parte del continente,nan
+es_f_1,{} nació en el año,{} nació en la ciudad de,{} falleció en el año,{} juega profesionalmente al,El {} fue diseñado por el arquitecto,La {} se encuentra en África,nan
+es_f_2,El año de nacimiento de {} es,La ciudad natal de {} es,El año de fallecimiento de {} es,El deporte con el que se asocia a {} es el,El {} es una obra maestra del aclamado arquitecto,La {} es parte del continente,nan
+es_f_3,{} nació en,El lugar de nacimiento de {} es la ciudad de,{} falleció en,{} participa en el deporte del,"Con su diseño innovador, el {} lleva la firma del arquitecto",La {} es parte del continente,nan
+it_m_1,{} nacque nell'anno,{}  è nato nella città di,{} morì nell'anno,{} pratica professionalmente il ,Il {} fu progettato dall'architetto,La {} si trova in,nan
+it_m_2,L'anno di nascita di {} è il,La città natale di {} è,L'anno della morte di {} è il,Lo sport con cui è associato {} è il,Il {} è un capolavoro dell'architetto ,La {} si trova in,nan
+it_m_3,La nascita di {} avvenne nel,Il luogo di nascita di {} è la città di,La scomparsa di {} avvenne nel,{} partecipa allo sport del,"Con il suo design innovativo, il {} porta la firma dell'architetto",La {} è parte del continente,nan
+it_f_1,{} nacque nel,{} è nata nella città di,{} morì nel,{} pratica professionalmente il,Il {} fu progettato dall'architetto,La {} si trova in,nan
+it_f_2,L'anno di nascita di {} è il,La città natale di {} è,L'anno della morte di {} è il,Lo sport con cui è associata {} è il,Il {} è un capolavoro dell'architetto ,La {} si trova in,nan
+it_f_3,{} nacque nel,Il luogo di nascita di {} è la città di,{} si spense nel,{} partecipa allo sport del,"Con il suo design innovativo, il {} porta la firma dell'architetto",La {} è parte del continente,nan
