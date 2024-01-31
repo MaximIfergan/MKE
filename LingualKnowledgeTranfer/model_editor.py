@@ -196,7 +196,7 @@ class KnowledgeEditor():
                         results[res_key]["prompt"] = {"pred": text_output[j],
                                                       "gold": dataset_sample["obj_true"]["label"][s_lang]}
                     if "gen" == s_type:
-                        if s_lang not in results[res_key]["gen"][s_lang]:
+                        if s_lang not in results[res_key]["gen"]:
                             results[res_key]["gen"][s_lang] = []
                         results[res_key]["gen"][s_lang].append({"pred": text_output[j],
                                                                 "gold": dataset_sample["obj_true"]["label"][s_lang]})
