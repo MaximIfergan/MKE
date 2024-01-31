@@ -134,10 +134,10 @@ class KnowledgeEvaluator:
             s_preds = []
             for batch in batch_prompt:
                 print(f"batch len {len(batch)}")
-                batch = self.tok(batch, return_tensors='pt', padding=True)
+                tok_batch = self.tok(batch, return_tensors='pt', padding=True)
                 model_output = self.model.generate(
-                    input_ids=batch['input_ids'].to('cuda:0'),
-                    attention_mask=batch['attention_mask'].to('cuda:0'),
+                    input_ids=tok_batch['input_ids'].to('cuda:0'),
+                    attention_mask=tok_batch['attention_mask'].to('cuda:0'),
                     max_new_tokens=5
                 )
                 print(f"model_output len {model_output.size()}")
