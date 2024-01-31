@@ -9,7 +9,6 @@ import random
 from Dataset.DatasetBuilder import FEW_SHOT, LANGS
 import matplotlib.pyplot as plt
 import numpy as np
-
 random.seed(18)
 
 # ===============================      Global Variables:      ===============================
@@ -100,7 +99,7 @@ class KnowledgeEvaluator:
         self.tok = None
         self.dataset = load_json_file(dataset_path)
         random.shuffle(self.dataset)  # TODO: For debug
-        self.dataset = self.dataset[:500]  # TODO: For debug
+        self.dataset = self.dataset[:520]  # TODO: For debug
         self.exp_name = exp_name
         self.results = from_file if not from_file else pd.read_csv(from_file)
 
@@ -112,6 +111,9 @@ class KnowledgeEvaluator:
 
         self.model.eval()
 
+        if self.results is not None:
+            known_ids = list(self.results["id"].values)
+
         dataset = self.dataset if not n_samples else self.dataset[:n_samples]
         print_title(f"Start {self.exp_name} evaluation")
 
@@ -119,6 +121,10 @@ class KnowledgeEvaluator:
         for i, sample in tqdm(enumerate(dataset), total=len(dataset)):
 
             sample_id = sample["id"]
+
+            if self.results is not None and sample_id in known_ids:
+                continue
+
             sample_langs = list(sample["prompt"].keys())
             sample_prompts = [sample["prompt"][lang] for lang in sample_langs]
 
@@ -150,7 +156,10 @@ class KnowledgeEvaluator:
         print(f"{self.exp_name} evaluation results: EM {eval_result['exact_match']},  F1: {eval_result['f1']}")
         final_results["F1"] = eval_result['f1_scores']
         final_results["EM"] = eval_result['exact_match_scores']
-        self.results = final_results
+
+        if self.results is not None:
+            self.results = pd.concat([self.results, final_results])
+
         self.save_results()
 
     def plot_results_by_language(self):
@@ -247,8 +256,8 @@ class KnowledgeEvaluator:
 
 
 def main():
-    ke = KnowledgeEvaluator(exp_name="mke_first_try")
-    ke.eval(model_name="bigscience/bloom-7b1", fewshot=True)
+    ke = KnowledgeEvaluator(exp_name="mke_first_try", from_file="mke_first_try_eval_res.csv")
+    ke.eval(model_name="bigscience/bloom-7b1", fewshot=True, space=True)
     ke.save_results()
     # ke.plot_results_by_language()
     # ke.plot_languages_relation_performance_mat()
