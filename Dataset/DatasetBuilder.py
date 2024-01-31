@@ -14,49 +14,41 @@ random.seed(18)
 
 # ===============================      Global Variables:      ===============================
 
-# LANGS = ["en", "fr", "ru", "he", "ar", "es", "it"]
-LANGS = ["en", "fr"]  # TODO: delete only for DEBUG
+LANGS = ["en", "fr", "ru", "he", "ar", "es", "it"]
 
+RELS = {"birth_city": "P19", "birth_year": "P569", "death_year": "P570", "geo_continent": "P30",
+        "architect_by": "P84", "sport_type": "P641"}
+
+
+# "tourist_attraction_country": "P17",
 def from_csv_to_template_dict(path):
-    df = pd.read_csv(path, index_col="relation")
+    df = pd.read_csv(path, index_col="lang/relation")
     result = dict()
-    for relation in df.index:
+    for relation in df.columns[:-1]:
         result[relation] = {lang: {"m": [], "f": []} for lang in LANGS}
         for lang in LANGS:
             for gender in ["m", "f"]:
                 for i in range(3):
-                    result[relation][lang][gender].append(df.loc[relation][f"{lang}_{gender}_{i + 1}"])
+                    result[relation][lang][gender].append(df.loc[f"{lang}_{gender}_{i + 1}"][relation])
     return result
+
 
 PROMPT_TEMPLATES = from_csv_to_template_dict("Dataset/dataset_templates.csv")
 
 CLIENT = Client()
 
-LANG2QID = {"en": "Q1860", "fr": "Q150", "he": "Q9288", "ar": "Q13955", "ru": "Q7737"}
+LANG2QID = {"en": "Q1860", "fr": "Q150", "he": "Q9288", "ar": "Q13955", "ru": "Q7737", "es": "Q1321", "it": "Q652"}
+QID2LAND = {"Q1860": "en", "Q150": "fr", "Q9288": "he", "Q13955": "ar", "Q7737": "ru", "Q1321": "es", "Q652": "it"}
 
-RAW_DATA_PATH = "Dataset/raw_data.json"
+RAW_DATA_PATH = "Dataset/mke_data.json"
 
-FEW_SHOT = {
-    "birth_year": {
-        "fr": "Abraham Lincoln est née en l'an 1809. Cristiano Ronaldo est née en l'an 1985. ",
-        "en": "Abraham Lincoln was born in the year 1809. Cristiano Ronaldo was born in the year 1985. "},
-    "death_year": {
-        "fr": "Abraham Lincoln est mort en l'an 1865. Albert Einstein est mort en l'an 1955. ",
-        "en": "Abraham Lincoln died in the year 1865. Albert Einstein died in the year 1955. "},
-    "birth_city": {
-        "fr": "Albert Einstein was born in the city of Ulm. Cristiano Ronaldo was born in the city of Funchal. ",
-        "en": "Albert Einstein est né dans une ville nommée Ulm. Cristiano Ronaldo est né dans une ville Funchal. "},
-    "sport": {
-        "fr": "Rafael Nadal joue professionnellement au sport du tennis. Cristiano Ronaldo joue professionnellement au sport du football. ",
-        "en": "Rafael Nadal professionally plays the sport of tennis. Cristiano Ronaldo professionally plays the sport of association football. "}
-}
+FEW_SHOT = load_json_file("Dataset/fewshots.json")
 
 ENTITIES2LABELS_PATH = "Dataset/ENTITIES2LABELS.json"
 
 with open(ENTITIES2LABELS_PATH, 'r') as file:
     ENTITIES2LABELS = json.load(file)
 
-PROMPT_TEMPLATES = from_csv_to_template_dict()
 
 # ===============================      Global functions:      ===============================
 
@@ -109,12 +101,12 @@ def merge_json_files(input_files, output_file):
                     print(f"Error reading JSON file {input_file}: {e}")
 
 
-def query_online(sparqlQuery):
+def query_online(sparqlQuery, return_type='json'):
     sparql = SPARQL("https://query.wikidata.org/sparql")
     res = sparql.queryAsListOfDicts(sparqlQuery)
-    # === CSV Format: ===
-    # csv = CSV.toCSV(qlod)
-    # pd.read_csv(io.StringIO(csv))
+    if return_type == 'csv':
+        csv = CSV.toCSV(res)
+        res = pd.read_csv(io.StringIO(csv))
     return res
 
 
@@ -169,122 +161,110 @@ def collect_data():
     return raw_data
 
 
+def preprocess_raw_collected_data(parallel_level=7, max_per_rel=10000, out_path="Dataset/mke_data.json"):
+    # === Raw Data Details ===
+    # = Hyper-Parameters:
+    # parallel_level: 7, max_per_rel: 10000 = Relation sizes: {
+    # 'birth_city': {'before': 100000, 'after': 5392},
+    # 'birth_year': {'before': 50000, 'after': 3509},
+    # 'death_year': {'before': 50000, 'after': 2207},
+    # 'geo_continent': {'before': 20000, 'after': 262},
+    # 'tourist_attraction_country': {'before': 4556, 'after': 304},
+    # 'architect_by': {'before': 20000, 'after': 828},
+    # 'sport_type': {'before': 20000, 'after': 829}}
+    # = Size: Before: 264556, Final 13331
+
+    results = []
+    filter_col = [f"s_{lang}" for lang in LANGS]
+    rel_sizes = {rel: dict() for rel in RELS.keys()}
+    for rel in RELS.keys():
+        df = pd.read_csv(f"Dataset/QueriesData/{rel}.csv")
+        rel_sizes[rel]["before"] = len(df)
+        df['empty_s'] = df.apply(lambda row: sum(row[column] == ''
+                                                 or pd.isnull(row[column]) for column in filter_col), axis=1)
+        df = df[len(LANGS) - parallel_level >= df['empty_s']][:max_per_rel]
+        rel_sizes[rel]["after"] = len(df)
+        rel_data = df.to_dict('records')  # To python dictionary
+        for sample in rel_data:
+            sample.pop("empty_s")
+            sample["rel"] = rel
+        results += rel_data
+    total_before = sum([rel_sizes[rel]["before"] for rel in RELS.keys()])
+    total_after = sum([rel_sizes[rel]["after"] for rel in RELS.keys()])
+    print("=== Raw Data Details ===")
+    print(f"= Hyper-Parameters:")
+    print(f"parallel_level: {parallel_level}, max_per_rel: {max_per_rel}")
+    print(f"= Relation sizes:")
+    print(rel_sizes)
+    print(f"= Size:")
+    print(f"Before: {total_before}, Final {total_after}")
+
+    # == Save the raw data ===
+    with open(out_path, 'w', encoding='utf8') as file:
+        for dictionary in results:
+            json.dump(dictionary, file, ensure_ascii=False)
+            file.write('\n')
+
+
 # ====================================      Class:      ====================================
 
 
 class DatasetBuilder:
 
     def __init__(self, raw_data_path=RAW_DATA_PATH):
+        self.target_labels_qid = None
         self.data = []
         self.raw_data = load_json_file(raw_data_path)
-        random.shuffle(self.raw_data)  # TODO: For debug
-        self.raw_data = self.raw_data[:10]  # TODO: For debug
+        # random.shuffle(self.raw_data)  # TODO: For debug
+        # self.raw_data = self.raw_data[:200]  # TODO: For debug
         self.id_count = 1
-        self.cities = {}
-        self.sports = {}
+        self.target_labels = {rel: dict() for rel in RELS.keys() if "year" not in rel}
 
     def preprocess(self):
-        self.construct_prompts()
-        self.sports_qid = list(self.sports.keys())
-        self.cities_qid = list(self.cities.keys())
-        self.assign_target_labels()
-        self.assign_loc_prompt()
-
-    def construct_prompts(self):
         for sample in self.raw_data:
-            query_type = sample['query']
-            if query_type == 'people':
-                self.preprocess_people_sample(sample)
-            elif query_type == 'sport':
-                self.append_sport_sample(sample)
+            self.construct_prompts(sample)
+        self.target_labels_qid = {rel: list(self.target_labels[rel].keys()) for rel in self.target_labels}
+        self.assign_target_labels()
 
-    def preprocess_people_sample(self, sample):
-        self.append_birth_year_sample(sample)
-        self.append_death_year_sample(sample)
-        self.append_birth_city_sample(sample)
+    def construct_prompts(self, sample):
+        if sample["rel"] in ["tourist_attraction_country"]:
+            return
 
-    def append_sport_sample(self, entity):
-        gender = 'M' if entity["gender"].endswith("Q6581097") else "F"
-        sport_qid = url_to_q_entity(entity["sportType"])
-        obj_true = {lang: get_entity_name(sport_qid, lang) for lang in LANGS}
-        sample = {"id": self.id_count,
-                  "subj": {"label": {lang: entity[f"o_{lang}"] for lang in obj_true.keys()},
-                           "qid": url_to_q_entity(entity["entitiy"]),
-                           "origin": entity["lang_code"],
-                           "gender": gender},
-                  "rel": {"label": "sport",
-                          "qid": "P641"},
-                  "obj_true": {"qid": sport_qid,
-                               "label": obj_true},
-                  "prompt": {lang: PROMPT_TEMPLATES["sport"][lang][gender][0].format(entity[f"o_{lang}"])
-                             for lang in obj_true.keys()},
-                  "paraphrase_prompts": {lang: [prompt.format(entity[f"o_{lang}"])
-                                                for prompt in PROMPT_TEMPLATES["sport"][lang][gender][1:]]
-                                         for lang in obj_true.keys()}}
-        self.sports[sport_qid] = obj_true
-        self.data.append(sample)
-        self.id_count += 1
+        if "gender" in sample.keys():
+            gender = 'm' if sample["gender"].endswith("Q6581097") else "f"
+        else:
+            gender = 'm'
+        subject_langs = [key.split("_")[1] for key in sample.keys() if
+                         key.startswith("s_") and str(sample[key]) != 'nan']
+        if "year" in sample["rel"]:
+            object_langs = subject_langs
+        else:
+            object_langs = [key.split("_")[1] for key in sample.keys() if
+                            key.startswith("o_") and str(sample[key]) != 'nan']
+        sample_lang = list(set(subject_langs) & set(object_langs))
+        if "year" in sample["rel"] and str(sample["o"]) == 'nan':
+            return
+        obj_true = {"qid": None if "year" in sample["rel"] else url_to_q_entity(sample["o"]),
+                    "label": {lang: str(int(sample["o"])) for lang in object_langs} if "year" in sample["rel"]
+                    else {lang: sample[f"o_{lang}"] for lang in sample_lang}}
+        new_sample = {"id": self.id_count,
+                      "subj": {"label": {lang: sample[f"s_{lang}"] for lang in sample_lang},
+                               "qid": url_to_q_entity(sample["s"]),
+                               "origin": None if "origin" not in sample else QID2LAND[
+                                   url_to_q_entity(sample["origin"])],
+                               "gender": gender},
+                      "rel": {"label": sample["rel"],
+                              "qid": RELS[sample["rel"]]},
+                      "obj_true": obj_true,
+                      "prompt": {lang: PROMPT_TEMPLATES[sample["rel"]][lang][gender][0].format(sample[f"s_{lang}"])
+                                 for lang in sample_lang},
+                      "paraphrase_prompts": {lang: [prompt.format(sample[f"s_{lang}"])
+                                                    for prompt in PROMPT_TEMPLATES[sample["rel"]][lang][gender][1:]]
+                                             for lang in sample_lang}}
 
-    def append_birth_year_sample(self, entity):
-        if "birthYear" not in entity:
-            return -1
-        gender = 'M' if entity["gender"].endswith("Q6581097") else "F"
-        sample = {"id": self.id_count,
-                  "subj": {"label": {lang: entity[f"s_{lang}"] for lang in LANGS},
-                           "qid": url_to_q_entity(entity["entitiy"]),
-                           "origin": entity["lang_code"],
-                           "gender": gender},
-                  "rel": {"label": "birth_year",
-                          "qid": "P569"},
-                  "obj_true": {"label": {lang: str(entity["birthYear"]) for lang in LANGS}},
-                  "prompt": {lang: PROMPT_TEMPLATES["birth_year"][lang][gender][0].format(entity[f"s_{lang}"])
-                             for lang in LANGS},
-                  "paraphrase_prompts": {lang: [prompt.format(entity[f"s_{lang}"])
-                                                for prompt in PROMPT_TEMPLATES["birth_year"][lang][gender][1:]]
-                                         for lang in LANGS}}
-        self.data.append(sample)
-        self.id_count += 1
-
-    def append_death_year_sample(self, entity):
-        if "deathYear" not in entity:
-            return -1
-        gender = 'M' if entity["gender"].endswith("Q6581097") else "F"
-        sample = {"id": self.id_count,
-                  "subj": {"label": {lang: entity[f"s_{lang}"] for lang in LANGS},
-                           "qid": url_to_q_entity(entity["entitiy"]),
-                           "origin": entity["lang_code"],
-                           "gender": gender},
-                  "rel": {"label": "death_year",
-                          "qid": "P570"},
-                  "obj_true": {"label": {lang: str(entity["deathYear"]) for lang in LANGS}},
-                  "prompt": {lang: PROMPT_TEMPLATES["death_year"][lang][gender][0].format(entity[f"s_{lang}"])
-                             for lang in LANGS},
-                  "paraphrase_prompts": {lang: [prompt.format(entity[f"s_{lang}"])
-                                                for prompt in PROMPT_TEMPLATES["death_year"][lang][gender][1:]]
-                                         for lang in LANGS}}
-        self.data.append(sample)
-        self.id_count += 1
-
-    def append_birth_city_sample(self, entity):
-        if "cityOfBirth" not in entity:
-            return -1
-        city_qid = url_to_q_entity(entity["cityOfBirth"])
-        obj_true = {lang: get_entity_name(city_qid, lang) for lang in LANGS}
-        gender = 'M' if entity["gender"].endswith("Q6581097") else "F"
-        sample = {"id": self.id_count,
-                  "subj": {"label": {lang: entity[f"s_{lang}"] for lang in obj_true.keys()},
-                           "qid": url_to_q_entity(entity["entitiy"]),
-                           "origin": entity["lang_code"],
-                           "gender": gender},
-                  "rel": {"label": "birth_city", "qid": "P19"},
-                  "obj_true": {"label": obj_true, "qid": city_qid},
-                  "prompt": {lang: PROMPT_TEMPLATES["birth_city"][lang][gender][0].format(entity[f"s_{lang}"])
-                             for lang in obj_true.keys()},
-                  "paraphrase_prompts": {lang: [prompt.format(entity[f"s_{lang}"])
-                                                for prompt in PROMPT_TEMPLATES["birth_city"][lang][gender][1:]]
-                                         for lang in obj_true.keys()}}
-        self.cities[city_qid] = obj_true
-        self.data.append(sample)
+        if "year" not in sample["rel"] and len(sample_lang) == len(LANGS):
+            self.target_labels[sample["rel"]][obj_true["qid"]] = obj_true
+        self.data.append(new_sample)
         self.id_count += 1
 
     def assign_target_labels(self):
@@ -293,24 +273,45 @@ class DatasetBuilder:
             diff = random.randint(1, 30)
             sign = random.randint(0, 1)
             final = diff if sign else -diff
-            if self.data[i]["rel"]["label"] == "birth_year":
-                self.data[i]["target_true"] = {"label": {lang: str(int(self.data[i]["obj_true"]["label"] + final))
-                                                         for lang in LANGS}}
-            elif self.data[i]["rel"]["label"] == "death_year":
-                self.data[i]["target_true"] = {"label": {lang: str(int(self.data[i]["obj_true"]["label"]) + final)
-                                                         for lang in LANGS}}
-            elif self.data[i]["rel"]["label"] == "birth_city":
-                r_cities = random.choices(self.cities_qid, k=2)
-                if r_cities[0] != self.data[i]["obj_true"]['qid']:
-                    self.data[i]["target_true"] = {"qid": r_cities[0], "label": self.cities[r_cities[0]]}
+            if 'year' in self.data[i]["rel"]["label"]:
+                self.data[i]["target_true"] = {
+                    "label": {lang: str(int(float(self.data[i]["obj_true"]["label"]['en']) + final))
+                              for lang in LANGS}}
+            else:
+                two_op = random.choices(self.target_labels_qid[self.data[i]["rel"]['label']], k=2)
+                if two_op[0] != self.data[i]["obj_true"]['qid']:
+                    self.data[i]["target_true"] = {"qid": two_op[0],
+                                                   "label": self.target_labels[self.data[i]["rel"]['label']][two_op[0]]}
                 else:
-                    self.data[i]["target_true"] = {"qid": r_cities[1], "label": self.cities[r_cities[1]]}
-            elif self.data[i]["rel"]["label"] == "sport":
-                r_sports = random.choices(self.sports_qid, k=2)
-                if r_sports[0] != self.data[i]["obj_true"]['qid']:
-                    self.data[i]["target_true"] = {"qid": r_sports[0], "label": self.sports[r_sports[0]]}
-                else:
-                    self.data[i]["target_true"] = {"qid": r_sports[0], "label": self.sports[r_sports[0]]}
+                    self.data[i]["target_true"] = {"qid": two_op[1],
+                                                   "label": self.target_labels[self.data[i]["rel"]['label']][two_op[1]]}
+
+    def save_fewshot_examples(self, out_path="Dataset/fewshots.json"):
+        fewshots = {rel: {lang: {"prompt": "", "p1": "", "p2": ""} for lang in LANGS} for rel in RELS.keys()}
+        rels_1 = []
+        rels_2 = []
+        for sample in self.data:
+            if len(list(sample['subj']['label'].keys())) != len(LANGS):
+                continue
+            if sample["rel"]["label"] not in rels_1:
+                rels_1.append(sample["rel"]["label"])
+            elif sample["rel"]["label"] not in rels_2:
+                rels_2.append(sample["rel"]["label"])
+            else:
+                continue
+            for lang in sample['subj']['label']:
+                fewshots[sample["rel"]["label"]][lang]["prompt"] += sample["prompt"][lang] + " " + \
+                                                                    sample["obj_true"]['label'][lang] + ". "
+                fewshots[sample["rel"]["label"]][lang]["p1"] += sample["paraphrase_prompts"][lang][0] + " " + \
+                                                                sample["obj_true"]['label'][lang] + ". "
+                fewshots[sample["rel"]["label"]][lang]["p2"] += sample["paraphrase_prompts"][lang][1] + " " + \
+                                                                sample["obj_true"]['label'][lang] + ". "
+
+            if len(rels_2) == len(list(RELS.keys())):
+                break
+        self.fewshots = fewshots
+        with open(out_path, 'w', encoding='utf8') as file:
+            json.dump(fewshots, file)
 
     def save(self, path):
         with open(path, 'w', encoding='utf8') as file:
@@ -320,13 +321,13 @@ class DatasetBuilder:
 
 
 def main():
-    # db = DatasetBuilder()
-    # db.preprocess()
-    # db.save("en-fr.json")
+    db = DatasetBuilder()
+    db.preprocess()
+    db.save("Dataset/mke_data.json")
     save_entities_labels()
     # convert_dict_to_csv()
     # raw_data = collect_data()
-    # with open('raw_data.json', 'w') as file:
+    # with open('raw_data_fr-en.json', 'w') as file:
     #     for dictionary in raw_data:
     #         json.dump(dictionary, file)
     #         file.write('\n')

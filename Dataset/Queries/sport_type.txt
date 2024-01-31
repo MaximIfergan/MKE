@@ -1,0 +1,28 @@
+SELECT
+?s ?s_en ?s_he ?s_fr ?s_ar ?s_ru ?s_it ?s_es
+?gender ?origin
+?o ?o_en ?o_he ?o_fr ?o_ar ?o_ru ?o_it ?o_es
+WHERE
+{
+  ?s wdt:P19 ?loc.  # place of birth
+  ?loc wdt:P31 wd:Q515. # demand city
+  ?loc wdt:P17 ?country. # counrty
+  VALUES ?origin {wd:Q1860 wd:Q150 wd:Q9288 wd:Q13955 wd:Q7737 wd:Q1321 wd:Q1321}
+  ?s wdt:P21 ?gender. # human gender
+  ?country wdt:P37 ?origin. # origin
+  ?s wdt:P641 ?o.  # sport
+  OPTIONAL {?s rdfs:label ?s_en filter (lang(?s_en) = "en")}.
+  OPTIONAL {?s rdfs:label ?s_he filter (lang(?s_he) = "he")}.
+  OPTIONAL {?s rdfs:label ?s_ar filter (lang(?s_ar) = "ar")}.
+  OPTIONAL {?s rdfs:label ?s_fr filter (lang(?s_fr) = "fr")}.
+  OPTIONAL {?s rdfs:label ?s_ru filter (lang(?s_ru) = "ru")}.
+  OPTIONAL {?s rdfs:label ?s_it filter (lang(?s_it) = "it")}.
+  OPTIONAL {?s rdfs:label ?s_es filter (lang(?s_es) = "es")}.
+  OPTIONAL {?o rdfs:label ?o_en filter (lang(?o_en) = "en")}.
+  OPTIONAL {?o rdfs:label ?o_he filter (lang(?o_he) = "he")}.
+  OPTIONAL {?o rdfs:label ?o_ar filter (lang(?o_ar) = "ar")}.
+  OPTIONAL {?o rdfs:label ?o_fr filter (lang(?o_fr) = "fr")}.
+  OPTIONAL {?o rdfs:label ?o_ru filter (lang(?o_ru) = "ru")}.
+  OPTIONAL {?o rdfs:label ?o_it filter (lang(?o_it) = "it")}.
+  OPTIONAL {?o rdfs:label ?o_es filter (lang(?o_es) = "es")}.
+} LIMIT 20000

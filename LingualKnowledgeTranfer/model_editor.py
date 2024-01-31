@@ -9,7 +9,6 @@ from util import load_json_file, print_title, evaluate_metrics, get_prefix
 from tqdm import tqdm
 from Dataset.DatasetBuilder import LANGS
 import random
-
 random.seed(18)
 
 # ===============================      Global Variables:      ===============================

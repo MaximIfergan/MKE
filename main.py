@@ -1,15 +1,7 @@
 import Dataset.DatasetBuilder as DatasetBuilder
-import pandas as pd
-import numpy as np
 import util
-# import EasyEdit
-# from EasyEdit.easyeditor import BaseEditor
-# from EasyEdit.easyeditor import ROMEHyperParams
-# from transformers import AutoTokenizer
-# from transformers import AutoModelForCausalLM
-# import torch
-import LingualKnowledgeTranfer.knowledge_evaluator
-import LingualKnowledgeTranfer.model_editor
+# import LingualKnowledgeTranfer.knowledge_evaluator
+# import LingualKnowledgeTranfer.model_editor
 
 def small_data_analysis():
     dataset = util.load_json_file("Dataset/en-fr.json")
@@ -38,8 +30,7 @@ def small_data_analysis():
 
 
 def main():
-    pass
-    # DatasetBuilder.main()
+    DatasetBuilder.main()
     # LingualKnowledgeTranfer.knowledge_evaluator.main()
     # LingualKnowledgeTranfer.model_editor.main()
 
