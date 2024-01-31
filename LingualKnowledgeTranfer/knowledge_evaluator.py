@@ -243,7 +243,6 @@ class KnowledgeEvaluator:
         plt.show()
 
     def save_results(self):
-        assert self.results
         self.results.to_csv(f'{self.exp_name}_eval_res.csv', index=False)
 
 
