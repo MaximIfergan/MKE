@@ -124,6 +124,9 @@ class KnowledgeEditor():
         results = dict() if not res_path else load_json_file(res_path)[0]
         for i, sample in tqdm(enumerate(self.known_facts), total=len(self.known_facts)):
 
+            if i > n_samples:
+                break
+
             # === save temp results in crash case:
             if i % 200 == 0:
                 self.results = results
@@ -180,7 +183,7 @@ class KnowledgeEditor():
             for batch in batch_eval:
 
                 batch_sents = [e[1] for e in batch]
-                batch_tok = tokenizer(batch_sents, return_tensors='pt', padding=True, max_length=30)
+                batch_tok = tokenizer(batch_sents, return_tensors='pt', padding=True)
                 model_output = edited_model.generate(
                     input_ids=batch_tok['input_ids'].to('cuda:0'),
                     attention_mask=batch_tok['attention_mask'].to('cuda:0'),
