@@ -257,7 +257,7 @@ class KnowledgeEvaluator:
 
 def main():
     ke = KnowledgeEvaluator(exp_name="mke_first_try", from_file="mke_first_try_eval_res.csv")
-    ke.eval(model_name="bigscience/bloom-7b1", fewshot=True, space=True)
+    ke.eval(model_name="bigscience/bloom-7b1", fewshot=True)
     ke.save_results()
     # ke.plot_results_by_language()
     # ke.plot_languages_relation_performance_mat()
