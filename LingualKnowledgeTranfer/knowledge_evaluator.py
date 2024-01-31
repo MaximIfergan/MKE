@@ -100,7 +100,7 @@ class KnowledgeEvaluator:
         self.tok = None
         self.dataset = load_json_file(dataset_path)
         random.shuffle(self.dataset)  # TODO: For debug
-        self.dataset = self.dataset[:200]  # TODO: For debug
+        self.dataset = self.dataset[:100]  # TODO: For debug
         self.exp_name = exp_name
         self.results = from_file if not from_file else pd.read_csv(from_file)
 
@@ -133,24 +133,16 @@ class KnowledgeEvaluator:
 
             s_preds = []
             for batch in batch_prompt:
-                print(f"batch len {len(batch)}")
                 tok_batch = self.tok(batch, return_tensors='pt', padding=True)
                 model_output = self.model.generate(
                     input_ids=tok_batch['input_ids'].to('cuda:0'),
                     attention_mask=tok_batch['attention_mask'].to('cuda:0'),
                     max_new_tokens=5
                 )
-                print(f"model_output len {model_output.size()}")
                 b_preds = [self.tok.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
-                print(f"b_preds len {len(b_preds)}")
                 b_preds = [get_prefix(b_preds[i][len(batch[i]):]) for i in range(len(batch))]
-                print(f"b_preds len {len(b_preds)}")
                 s_preds += b_preds
-            print(f"s_preds len {len(s_preds)}")
-            print(f"golds len {len(s_preds)}")
-            print(f"sample_langs len {len(sample_langs)}")
             sample_results = [[sample_id, sample_langs[i], s_preds[i], golds[i]] for i in range(len(sample_langs))]
-            print(sample_results)
             results += sample_results
 
         final_results = pd.DataFrame(results, columns=["id", "lang", "pred", "gold"])
