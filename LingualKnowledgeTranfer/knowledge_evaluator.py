@@ -133,7 +133,7 @@ class KnowledgeEvaluator:
             s_preds = []
             for batch in batch_prompt:
                 print(batch)
-                batch = self.tok(batch, return_tensors='pt', padding=False)
+                batch = self.tok(batch, return_tensors='pt', padding=True)
                 model_output = self.model.generate(
                     input_ids=batch['input_ids'].to('cuda:0'),
                     attention_mask=batch['attention_mask'].to('cuda:0'),
