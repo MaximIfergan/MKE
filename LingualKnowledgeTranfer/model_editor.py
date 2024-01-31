@@ -131,10 +131,12 @@ class KnowledgeEditor():
 
             # === init params:
             sample_id, sample_lang = sample
+            print(sample)
             res_key = str(sample_id) + "_" + sample_lang
             if res_key in results:
                 continue
             dataset_sample = self.dataset[sample_id - 1]
+            print(dataset_sample)
             results[res_key] = {"prompt": None, "gen": dict(), "loc": dict()}
 
             # === edit:
