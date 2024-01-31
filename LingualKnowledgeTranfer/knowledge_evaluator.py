@@ -104,7 +104,7 @@ class KnowledgeEvaluator:
         self.exp_name = exp_name
         self.results = from_file if not from_file else pd.read_csv(from_file)
 
-    def eval(self, model_name, bs=4, n_samples=None, fewshot=False, space=False):
+    def eval(self, model_name, bs=1, n_samples=None, fewshot=False, space=False):
         self.tok = AutoTokenizer.from_pretrained(model_name, use_fast=False, padding_side="left",
                                                  trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True, torch_dtype=torch.float16,
