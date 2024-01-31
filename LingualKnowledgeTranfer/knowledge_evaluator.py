@@ -100,7 +100,7 @@ class KnowledgeEvaluator:
         self.tok = None
         self.dataset = load_json_file(dataset_path)
         random.shuffle(self.dataset)  # TODO: For debug
-        self.dataset = self.dataset[:100]  # TODO: For debug
+        self.dataset = self.dataset[:500]  # TODO: For debug
         self.exp_name = exp_name
         self.results = from_file if not from_file else pd.read_csv(from_file)
 
