@@ -109,6 +109,7 @@ class KnowledgeEvaluator:
                                                  trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True, torch_dtype=torch.float16,
                                                           trust_remote_code=True).to('cuda:0')
+
         self.model.eval()
 
         dataset = self.dataset if not n_samples else self.dataset[:n_samples]
@@ -139,7 +140,9 @@ class KnowledgeEvaluator:
                     attention_mask=batch['attention_mask'].to('cuda:0'),
                     max_new_tokens=5
                 )
+                print(model_output)
                 b_preds = [self.tok.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
+                print(len(b_preds))
                 b_preds = [get_prefix(b_preds[i][len(batch[i]):]) for i in range(len(batch))]
                 print(b_preds)
                 s_preds += b_preds
