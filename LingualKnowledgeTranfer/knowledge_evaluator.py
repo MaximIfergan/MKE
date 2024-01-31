@@ -133,21 +133,24 @@ class KnowledgeEvaluator:
 
             s_preds = []
             for batch in batch_prompt:
-                print(batch)
+                print(f"batch len {len(batch)}")
                 batch = self.tok(batch, return_tensors='pt', padding=True)
                 model_output = self.model.generate(
                     input_ids=batch['input_ids'].to('cuda:0'),
                     attention_mask=batch['attention_mask'].to('cuda:0'),
                     max_new_tokens=5
                 )
-                print(model_output)
+                print(f"model_output len {model_output.size()}")
                 b_preds = [self.tok.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
-                print(len(b_preds))
+                print(f"b_preds len {len(b_preds)}")
                 b_preds = [get_prefix(b_preds[i][len(batch[i]):]) for i in range(len(batch))]
-                print(b_preds)
+                print(f"b_preds len {len(b_preds)}")
                 s_preds += b_preds
-            print(s_preds)
+            print(f"s_preds len {len(s_preds)}")
+            print(f"golds len {len(s_preds)}")
+            print(f"sample_langs len {len(sample_langs)}")
             sample_results = [[sample_id, sample_langs[i], s_preds[i], golds[i]] for i in range(len(sample_langs))]
+            print(sample_results)
             results += sample_results
 
         final_results = pd.DataFrame(results, columns=["id", "lang", "pred", "gold"])
