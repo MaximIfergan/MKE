@@ -1,6 +1,6 @@
 import Dataset.DatasetBuilder as DatasetBuilder
 import util
-# import LingualKnowledgeTranfer.knowledge_evaluator
+import LingualKnowledgeTranfer.knowledge_evaluator
 # import LingualKnowledgeTranfer.model_editor
 
 def small_data_analysis():
@@ -30,8 +30,8 @@ def small_data_analysis():
 
 
 def main():
-    DatasetBuilder.main()
-    # LingualKnowledgeTranfer.knowledge_evaluator.main()
+    # DatasetBuilder.main()
+    LingualKnowledgeTranfer.knowledge_evaluator.main()
     # LingualKnowledgeTranfer.model_editor.main()
 
     # ==================== Others  ====================

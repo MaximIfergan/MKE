@@ -99,6 +99,8 @@ class KnowledgeEvaluator:
         self.model = None
         self.tok = None
         self.dataset = load_json_file(dataset_path)
+        random.shuffle(self.dataset)  # TODO: For debug
+        self.dataset = self.dataset[:200]  # TODO: For debug
         self.exp_name = exp_name
         self.results = from_file if not from_file else pd.read_csv(from_file)
 
@@ -120,7 +122,7 @@ class KnowledgeEvaluator:
             sample_prompts = [sample["prompt"][lang] for lang in sample_langs]
 
             if fewshot:
-                sample_prompts = [FEW_SHOT[sample["rel"]["label"]] + " " + prompt for prompt in sample_prompts]
+                sample_prompts = [FEW_SHOT[sample["rel"]["label"]]  + prompt for prompt in sample_prompts]
             if space:
                 sample_prompts = [prompt + " " for prompt in sample_prompts]
 
@@ -244,10 +246,11 @@ class KnowledgeEvaluator:
 
 
 def main():
-    # # Fewshot_Fix evaluation results: EM 1.3332846288720046,  F1: 3.4904284137188792
-    ke = KnowledgeEvaluator(exp_name="Fewshot_Fix", from_file="Fewshot_Fix_eval_res.csv")
-    ke.plot_results_by_language()
-    ke.plot_languages_relation_performance_mat()
-    ke.plot_number_of_languages_per_question_by_languages()
+    ke = KnowledgeEvaluator(exp_name="mke_first_try")
+    ke.eval(model_name="bigscience/bloom-7b1", fewshot=True)
+    ke.save_results()
+    # ke.plot_results_by_language()
+    # ke.plot_languages_relation_performance_mat()
+    # ke.plot_number_of_languages_per_question_by_languages()
     # ke.eval(model_name="bigscience/bloom-7b1")
     # ke.save_results()
