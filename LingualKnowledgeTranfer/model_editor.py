@@ -191,7 +191,7 @@ class KnowledgeEditor():
 
                 # = save batch eval:
                 for j in range(len(batch)):
-                    s_lang, s_type = batch[j][0].split("_")
+                    s_lang, s_type = batch[j][0].split("_")[:2]
                     if "prompt" == s_type:
                         results[res_key]["prompt"] = {"pred": text_output[j],
                                                       "gold": dataset_sample["obj_true"]["label"][s_lang]}
