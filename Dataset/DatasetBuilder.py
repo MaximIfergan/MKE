@@ -280,12 +280,9 @@ class DatasetBuilder:
             else:
                 two_op = random.choices(self.target_labels_qid[self.data[i]["rel"]['label']], k=2)
                 if two_op[0] != self.data[i]["obj_true"]['qid']:
-                    self.data[i]["target_true"] = {"qid": two_op[0],
-                                                   "label": self.target_labels[self.data[i]["rel"]['label']][two_op[0]]}
+                    self.data[i]["target_true"] = self.target_labels[self.data[i]["rel"]['label']][two_op[0]]
                 else:
-                    self.data[i]["target_true"] = {"qid": two_op[1],
-                                                   "label": self.target_labels[self.data[i]["rel"]['label']][two_op[1]]}
-
+                    self.data[i]["target_true"] = self.target_labels[self.data[i]["rel"]['label']][two_op[1]]
     def save_fewshot_examples(self, out_path="Dataset/fewshots.json"):
         fewshots = {rel: {lang: {"prompt": "", "p1": "", "p2": ""} for lang in LANGS} for rel in RELS.keys()}
         rels_1 = []
