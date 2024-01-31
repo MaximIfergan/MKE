@@ -140,6 +140,7 @@ class KnowledgeEvaluator:
                 )
                 b_preds = [self.tok.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
                 b_preds = [get_prefix(b_preds[i][len(batch[i]):]) for i in range(len(batch))]
+                print(b_preds)
                 s_preds += b_preds
             sample_results = [[sample_id, sample_langs[i], s_preds[i], golds[i]] for i in range(len(sample_langs))]
             results += sample_results
