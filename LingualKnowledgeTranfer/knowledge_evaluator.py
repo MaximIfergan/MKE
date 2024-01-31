@@ -165,10 +165,11 @@ class KnowledgeEvaluator:
     def plot_results_by_language(self):
         """ plots the accuracy by language """
         df = self.results
+        all_df = df[["F1", "EM"]].mean() * 100
         df = df.groupby(["lang"])[["F1", "EM"]].mean() * 100
-        labels = list(df.axes[0])
-        f1 = [round(value, 2) for value in df["F1"]]
-        em = [round(value, 2) for value in df["EM"]]
+        labels = ["all"] + list(df.axes[0])
+        f1 = [round(all_df["F1"], 2)] + [round(value, 1) for value in df["F1"]]
+        em = [round(all_df["EM"], 2)] + [round(value, 1) for value in df["EM"]]
 
         x = np.arange(len(labels))  # the label locations
         width = 0.35  # the width of the bars
@@ -256,11 +257,11 @@ class KnowledgeEvaluator:
 
 
 def main():
-    ke = KnowledgeEvaluator(exp_name="mke_first_try", from_file="mke_first_try_eval_res.csv")
-    ke.eval(model_name="bigscience/bloom-7b1", fewshot=True)
-    ke.save_results()
-    # ke.plot_results_by_language()
-    # ke.plot_languages_relation_performance_mat()
-    # ke.plot_number_of_languages_per_question_by_languages()
+    ke = KnowledgeEvaluator(exp_name="mke_first_try", from_file="mke_first_try_eval_res (3).csv")
+    # ke.eval(model_name="bigscience/bloom-7b1", fewshot=True)
+    # ke.save_results()
+    ke.plot_results_by_language()
+    ke.plot_languages_relation_performance_mat()
+    ke.plot_number_of_languages_per_question_by_languages()
     # ke.eval(model_name="bigscience/bloom-7b1")
     # ke.save_results()

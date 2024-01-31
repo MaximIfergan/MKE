@@ -7,7 +7,7 @@ from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
 from util import load_json_file, print_title, evaluate_metrics, get_prefix
 from tqdm import tqdm
-from Dataset.DatasetBuilder import LANGS
+from Dataset.DatasetBuilder import LANGS, FEW_SHOT
 import random
 random.seed(18)
 
@@ -15,7 +15,6 @@ random.seed(18)
 
 DATASET_PATH = "Dataset/en-fr.json"
 F1_SUCCESS = 0.4
-
 
 # ===============================      Global functions:      ===============================
 
@@ -115,7 +114,7 @@ class KnowledgeEditor():
         self.eval_results = pd.read_csv(eval_results_path)
         self.compute_known_facts()
 
-    def edit(self, bs=4, n_samples=None, fewshot=False, res_path=None):
+    def edit(self, bs=1, n_samples=None, fewshot=False, res_path=None):
 
         hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False, padding_side="left",
@@ -157,9 +156,13 @@ class KnowledgeEditor():
             # accuracy:
             sample_eval = [(f"{sample_lang}_prompt", dataset_sample["prompt"][sample_lang])]
 
+            # if fewshot:
+            #     sample_eval = [(f"{sample_lang}_prompt", FEW_SHOT[dataset_sample["rel"]["label"]][sample_lang]["prompt"] + dataset_sample["prompt"][sample_lang])]
+
             # generalization:
             sample_eval += [(f"{lang}_gen_0", dataset_sample['prompt'][lang])
                             for lang in dataset_sample["prompt"].keys() if lang != sample_lang]
+
             sample_eval += [(f"{lang}_gen_{i + 1}", dataset_sample['paraphrase_prompts'][lang][i])
                             for lang in dataset_sample["prompt"].keys()
                             for i in range(len(dataset_sample['paraphrase_prompts'][lang]))]
@@ -260,7 +263,7 @@ class KnowledgeEditor():
         self.final_results = final_results
 
 def main():
-    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="all_2",
-                         eval_results_path="Fewshot_Fix_eval_res.csv")
-    ke.edit(res_path="all.json")
+    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="mke_first",
+                         eval_results_path="mke_first_try_eval_res.csv")
+    ke.edit(n_samples=2)
     ke.save_results()
