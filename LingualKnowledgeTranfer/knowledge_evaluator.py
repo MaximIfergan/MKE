@@ -142,6 +142,7 @@ class KnowledgeEvaluator:
                 b_preds = [get_prefix(b_preds[i][len(batch[i]):]) for i in range(len(batch))]
                 print(b_preds)
                 s_preds += b_preds
+            print(s_preds)
             sample_results = [[sample_id, sample_langs[i], s_preds[i], golds[i]] for i in range(len(sample_langs))]
             results += sample_results
 
