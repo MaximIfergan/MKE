@@ -126,9 +126,6 @@ class KnowledgeEditor():
         results = dict() if not res_path else load_json_file(res_path)[0]
         for i, sample in tqdm(enumerate(self.known_facts), total=len(self.known_facts)):
 
-            if i > n_samples:
-                break
-
             # === save temp results in crash case:
             if i % 200 == 0:
                 self.results = results
@@ -276,5 +273,10 @@ class KnowledgeEditor():
 def main():
     ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="bg",
                          eval_results_path="bg_eval_res.csv")
+    ke.edit(fewshot=True)
+    ke.save_results()
+    return
+    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="mke",
+                         eval_results_path="mke_eval_res.csv")
     ke.edit()
     ke.save_results()
