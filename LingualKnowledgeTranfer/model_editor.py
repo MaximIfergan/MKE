@@ -275,6 +275,6 @@ class KnowledgeEditor():
 
 def main():
     ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="bg",
-                         eval_results_path="bg_eval_res.csv.csv")
+                         eval_results_path="bg_eval_res.csv")
     ke.edit()
     ke.save_results()

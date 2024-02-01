@@ -259,7 +259,7 @@ class KnowledgeEvaluator:
 
 
 def main():
-    ke = KnowledgeEvaluator(exp_name="bg")
+    ke = KnowledgeEvaluator(exp_name="bg", from_file="bg_eval_res.csv")
     ke.eval(model_name="bigscience/bloom-7b1", fewshot=True)
     ke.save_results()
     return
