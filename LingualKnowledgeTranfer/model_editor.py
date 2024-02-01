@@ -160,9 +160,6 @@ class KnowledgeEditor():
             # accuracy:
             sample_eval = [(f"{sample_lang}_prompt", dataset_sample["prompt"][sample_lang])]
 
-            # if fewshot:
-            #     sample_eval = [(f"{sample_lang}_prompt", FEW_SHOT[dataset_sample["rel"]["label"]][sample_lang]["prompt"] + dataset_sample["prompt"][sample_lang])]
-
             # generalization:
             sample_eval += [(f"{lang}_gen_0", dataset_sample['prompt'][lang])
                             for lang in dataset_sample["prompt"].keys() if lang != sample_lang]
@@ -170,6 +167,10 @@ class KnowledgeEditor():
             sample_eval += [(f"{lang}_gen_{i + 1}", dataset_sample['paraphrase_prompts'][lang][i])
                             for lang in dataset_sample["prompt"].keys()
                             for i in range(len(dataset_sample['paraphrase_prompts'][lang]))]
+
+            if fewshot:
+                sample_eval = [(x[0], FEW_SHOT[dataset_sample["rel"]["label"]][x[0].split("_")[0]]["prompt"] + x[1])
+                               for x in sample_eval]
 
             # locality:
 
@@ -197,12 +198,12 @@ class KnowledgeEditor():
                     s_lang, s_type = batch[j][0].split("_")[:2]
                     if "prompt" == s_type:
                         results[res_key]["prompt"] = {"pred": text_output[j],
-                                                      "gold": dataset_sample["obj_true"]["label"][s_lang]}
+                                                      "gold": dataset_sample["target_true"]["label"][s_lang]}
                     if "gen" == s_type:
                         if s_lang not in results[res_key]["gen"]:
                             results[res_key]["gen"][s_lang] = []
                         results[res_key]["gen"][s_lang].append({"pred": text_output[j],
-                                                                "gold": dataset_sample["obj_true"]["label"][s_lang]})
+                                                                "gold": dataset_sample["target_true"]["label"][s_lang]})
                     if "loc" == s_type:
                         results[res_key]["loc"][s_lang] = {"pred": text_output[j],
                                                            "gold": batch[j][2]}
@@ -214,7 +215,7 @@ class KnowledgeEditor():
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = {tuple(x) for x in known_ids.values}
 
-    def build_locality_prompts(self, size_per_lang=200):
+    def build_locality_prompts(self, size_per_lang=200, fewshot=True):
         df_suc = self.eval_results[self.eval_results['F1'] > F1_SUCCESS].sample(frac=1)
         locality_prompts = {lang: [] for lang in LANGS}
         for ind in df_suc.index:
@@ -224,7 +225,9 @@ class KnowledgeEditor():
                 continue
             else:
                 dataset_sample = self.dataset[s_id - 1]
-                locality_prompts[s_lang].append((s_id, dataset_sample["prompt"][s_lang], df_suc['pred'][ind]))
+                if fewshot:
+                    prompt = FEW_SHOT[dataset_sample["rel"]["label"]][s_lang]["prompt"] + dataset_sample["prompt"][s_lang]
+                locality_prompts[s_lang].append((s_id, prompt, df_suc['pred'][ind]))
         self.locality_prompts = locality_prompts
         # with open(f"{self.exp_name}_locality_prompts.json", "w") as outfile:
         #     json.dump(locality_prompts, outfile)
@@ -269,5 +272,5 @@ class KnowledgeEditor():
 def main():
     ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="mke_first",
                          eval_results_path="mke_first_try_eval_res.csv")
-    ke.edit(n_samples=2)
+    ke.edit(n_samples=10)
     ke.save_results()
