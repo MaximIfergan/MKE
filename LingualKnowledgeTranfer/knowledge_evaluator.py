@@ -159,6 +159,8 @@ class KnowledgeEvaluator:
 
         if self.results is not None:
             self.results = pd.concat([self.results, final_results])
+        else:
+            self.results = final_results
 
         self.save_results()
 
