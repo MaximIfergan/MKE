@@ -32,7 +32,7 @@ def small_data_analysis():
 
 def main():
     # DatasetBuilder.main()
-    # LingualKnowledgeTranfer.knowledge_evaluator.main()
+    LingualKnowledgeTranfer.knowledge_evaluator.main()
     LingualKnowledgeTranfer.model_editor.main()
 
     # ==================== Others  ====================

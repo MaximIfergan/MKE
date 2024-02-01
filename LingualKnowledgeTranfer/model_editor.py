@@ -9,12 +9,14 @@ from util import load_json_file, print_title, evaluate_metrics, get_prefix
 from tqdm import tqdm
 from Dataset.DatasetBuilder import LANGS, FEW_SHOT
 import random
+
 random.seed(18)
 
 # ===============================      Global Variables:      ===============================
 
 DATASET_PATH = "Dataset/mke_data.json"
 F1_SUCCESS = 0.4
+
 
 # ===============================      Global functions:      ===============================
 
@@ -226,7 +228,8 @@ class KnowledgeEditor():
             else:
                 dataset_sample = self.dataset[s_id - 1]
                 if fewshot:
-                    prompt = FEW_SHOT[dataset_sample["rel"]["label"]][s_lang]["prompt"] + dataset_sample["prompt"][s_lang]
+                    prompt = FEW_SHOT[dataset_sample["rel"]["label"]][s_lang]["prompt"] + dataset_sample["prompt"][
+                        s_lang]
                 locality_prompts[s_lang].append((s_id, prompt, df_suc['pred'][ind]))
         self.locality_prompts = locality_prompts
         # with open(f"{self.exp_name}_locality_prompts.json", "w") as outfile:
@@ -269,8 +272,9 @@ class KnowledgeEditor():
 
         self.final_results = final_results
 
+
 def main():
-    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="mke_first",
-                         eval_results_path="mke_first_try_eval_res.csv")
-    ke.edit(n_samples=10)
+    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="bg",
+                         eval_results_path="bg_eval_res.csv.csv")
+    ke.edit()
     ke.save_results()
