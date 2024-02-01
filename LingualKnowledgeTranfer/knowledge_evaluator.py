@@ -98,8 +98,8 @@ class KnowledgeEvaluator:
         self.model = None
         self.tok = None
         self.dataset = load_json_file(dataset_path)
-        random.shuffle(self.dataset)  # TODO: For debug
-        self.dataset = self.dataset[:130]  # TODO: For debug
+        # random.shuffle(self.dataset)  # TODO: For debug
+        # self.dataset = self.dataset[:130]  # TODO: For debug
         self.exp_name = exp_name
         self.results = from_file if not from_file else pd.read_csv(from_file)
 
@@ -259,10 +259,6 @@ class KnowledgeEvaluator:
 
 
 def main():
-    ke = KnowledgeEvaluator(exp_name="bg", from_file="bg_eval_res.csv")
-    ke.eval(model_name="bigscience/bloom-7b1", fewshot=True)
-    ke.save_results()
-    return
     ke = KnowledgeEvaluator(exp_name="mke", from_file="mke_first_try_eval_res.csv")
     ke.eval(model_name="bigscience/bloom-7b1", fewshot=True)
     ke.save_results()
