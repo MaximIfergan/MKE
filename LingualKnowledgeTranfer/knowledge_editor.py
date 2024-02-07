@@ -9,14 +9,13 @@ from util import load_json_file, print_title, evaluate_metrics, get_prefix
 from tqdm import tqdm
 from Dataset.DatasetBuilder import LANGS, FEW_SHOT
 import random
-
+import logging
 random.seed(18)
 
 # ===============================      Global Variables:      ===============================
 
 DATASET_PATH = "Dataset/mke_data.json"
 F1_SUCCESS = 0.4
-
 
 # ===============================      Global functions:      ===============================
 
@@ -34,7 +33,7 @@ def get_prefix(input_string):  # TODO: delete duplicate in KE
 
 
 # TODO: delete function:
-def simple_edit_exmaple():
+def simple_edit_example():
     hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
 
     prompts = ["Abraham Lincoln was born in the year of",
@@ -106,10 +105,11 @@ def simple_edit_exmaple():
 
 class KnowledgeEditor():
 
-    def __init__(self, model_name, eval_results_path, dataset_path=DATASET_PATH, exp_name=""):
+    def __init__(self, model_name, eval_results_path, from_file=None, dataset_path=DATASET_PATH, exp_name=""):
         self.final_results = None
-        self.results = None
         self.known_facts = None
+        self.from_file = from_file
+        self.results = dict() if from_file is None else load_json_file(from_file)[0]
         self.model_name = model_name
         self.exp_name = exp_name
         self.dataset = load_json_file(dataset_path)
@@ -117,17 +117,43 @@ class KnowledgeEditor():
         self.compute_known_facts()
         self.build_locality_prompts()
 
-    def edit(self, bs=1, n_samples=None, fewshot=False, res_path=None):
+    def edit(self, bs=1, n_samples=None, fewshot=True):
 
+        if self.from_file is None:
+            logging.info(f"Starting {self.exp_name} editing")
+        else:
+            logging.info(f"Resuming {self.exp_name} editing from {self.from_file}")
+
+        results = self.results
+
+        logging.info(f"Loading edition HyperParams")
         hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False, padding_side="left",
                                                   trust_remote_code=True)
 
-        results = dict() if not res_path else load_json_file(res_path)[0]
-        for i, sample in tqdm(enumerate(self.known_facts), total=len(self.known_facts)):
+        known_facts = self.known_facts
+        if n_samples:
+            logging.info(f"Limit edition to {n_samples} samples")
+            known_facts = self.known_facts[:n_samples]
+
+        # Print dataset info:
+        size_info = dict()
+        for sample in known_facts:
+            sample_id, sample_lang = sample
+            if sample_lang not in size_info:
+                size_info[sample_lang] = 1
+            else:
+                size_info[sample_lang] += 1
+        msg = f"Edition dataset sizes:\nTotal size: {len(known_facts)} -"
+        msg += ", ".join([f"{lang}: {size_info}" for lang in size_info])
+        logging.info(msg)
+
+        # Start editing
+        for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
 
             # === save temp results in crash case:
-            if i % 200 == 0:
+            if i % 100 == 0:
+                logging.info(f"Saving backup at step {i} to {self.exp_name}.json")
                 self.results = results
                 with open(f"{self.exp_name}.json", "w") as outfile:
                     json.dump(self.results, outfile)
@@ -141,7 +167,6 @@ class KnowledgeEditor():
             results[res_key] = {"prompt": None, "gen": dict(), "loc": dict()}
 
             # === edit:
-
             ground_truth = dataset_sample["obj_true"]["label"][sample_lang]
             target_new = dataset_sample["target_true"]["label"][sample_lang]
 
@@ -154,7 +179,7 @@ class KnowledgeEditor():
                 keep_original_weight=False
             )
 
-            # === eval accuracy, generalization, locality
+            # === eval accuracy, generalization, locality:
 
             # accuracy:
             sample_eval = [(f"{sample_lang}_prompt", dataset_sample["prompt"][sample_lang])]
@@ -207,12 +232,21 @@ class KnowledgeEditor():
                         results[res_key]["loc"][s_lang] = {"pred": text_output[j],
                                                            "gold": batch[j][2]}
 
+            # Print edit example for debug:
+            if i % 50 == 0:
+                msg = f"Editing example for {sample_id} in {sample_lang}:\n"
+                msg += f"{ground_truth} -> {target_new}: {dataset_sample['prompt'][sample_lang]}\n"
+                msg += f"Prompt results: {results[res_key]['prompt']['pred']}\n"
+                msg += "Generalization results: " + str(results[res_key]["gen"]) + "\n"
+                msg += "Locality results: " + str(results[res_key]["loc"])
+                logging.info(msg)
+
         self.results = results
 
     def compute_known_facts(self):
         eval_known_facts = self.eval_results[self.eval_results['F1'] >= F1_SUCCESS]
         known_ids = eval_known_facts[["id", "lang"]]
-        self.known_facts = {tuple(x) for x in known_ids.values}
+        self.known_facts = [tuple(x) for x in known_ids.values]
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
         df_suc = self.eval_results[self.eval_results['F1'] > F1_SUCCESS].sample(frac=1)
@@ -233,45 +267,50 @@ class KnowledgeEditor():
         #     json.dump(locality_prompts, outfile)
 
     def save_results(self):
-        with open(f"{self.exp_name}.json", "w") as outfile:
+        with open(f"{self.exp_name}_edition.json", "w") as outfile:
             json.dump(self.results, outfile)
 
     def calculate_editing_result_metrics(self):
 
+        results = self.results
         columns = ["acc"]
         columns += [f"gen_{lang}" for lang in LANGS]
         columns += [f"loc_{lang}" for lang in LANGS]
-        final_results = pd.DataFrame(index=LANGS, columns=columns)
+        final_results = pd.DataFrame(columns=columns)
         acc_golds = {lang: [] for lang in LANGS}
         acc_preds = {lang: [] for lang in LANGS}
         gen_golds = {o_lang: {i_lang: [] for i_lang in LANGS} for o_lang in LANGS}
         gen_preds = {o_lang: {i_lang: [] for i_lang in LANGS} for o_lang in LANGS}
         loc_golds = {o_lang: {i_lang: [] for i_lang in LANGS} for o_lang in LANGS}
         loc_preds = {o_lang: {i_lang: [] for i_lang in LANGS} for o_lang in LANGS}
-        for s_edit in self.results.keys():
+
+        for s_edit in results.keys():
             s_id, s_lang = s_edit.split("_")
-            acc_golds[s_lang].append(self.results[s_edit]["prompt"]["gold"])
-            acc_preds[s_lang].append(self.results[s_edit]["prompt"]["pred"])
-            for c_lang in LANGS:
-                gen_golds[s_edit][c_lang] += [p["gold"] for p in self.results[s_edit][c_lang]["gen"]]
-                gen_preds[s_edit][c_lang] += [p["pred"] for p in self.results[s_edit][c_lang]["gen"]]
-                loc_golds[s_edit][c_lang].append(self.results[s_edit]["loc"][c_lang]["gold"])
-                loc_preds[s_edit][c_lang].append(self.results[s_edit]["loc"][c_lang]["pred"])
+            acc_golds[s_lang].append(results[s_edit]["prompt"]["gold"])
+            acc_preds[s_lang].append(results[s_edit]["prompt"]["pred"])
+            for c_lang in results[s_edit]["gen"].keys():
+                gen_golds[s_lang][c_lang] += [p["gold"] for p in results[s_edit]["gen"][c_lang]]
+                gen_preds[s_lang][c_lang] += [p["pred"] for p in results[s_edit]["gen"][c_lang]]
+
+            for c_lang in results[s_edit]["loc"].keys():
+                loc_golds[s_lang][c_lang].append(results[s_edit]["loc"][c_lang]["gold"])
+                loc_preds[s_lang][c_lang].append(results[s_edit]["loc"][c_lang]["pred"])
 
         for lang in LANGS:
             e_result = evaluate_metrics(acc_golds[lang], acc_preds[lang])
-            acc = f"EM: {e_result['exact_match']}/F1: {e_result['f1']}"
+            acc = f"EM:{round(e_result['exact_match'], 2)} / F1:{round(e_result['f1'], 2)}"
             loc_results = [evaluate_metrics(loc_golds[lang][i_lang], loc_preds[lang][i_lang]) for i_lang in LANGS]
             gen_results = [evaluate_metrics(gen_golds[lang][i_lang], gen_preds[lang][i_lang]) for i_lang in LANGS]
-            loc_results = [f"EM: {r['exact_match']}/F1: {r['f1']}" for r in loc_results]
-            gen_results = [f"EM: {r['exact_match']}/F1: {r['f1']}" for r in gen_results]
-            final_results[lang] = [acc] + gen_results + loc_results
+            loc_results = [f"EM:{round(r['exact_match'], 2)} / F1:{round(r['f1'], 2)}" for r in loc_results]
+            gen_results = [f"EM:{round(r['exact_match'], 2)} / F1:{round(r['f1'], 2)}" for r in gen_results]
+            final_results.loc[lang] = [acc] + gen_results + loc_results
 
         self.final_results = final_results
+        final_results.to_csv(f"{self.exp_name}_edition_metrics.csv")
 
 
 def main():
     ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="mke",
-                         eval_results_path="mke_eval_res.csv")
-    ke.edit(fewshot=True)
+                         eval_results_path="mke_evaluation.csv")
+    ke.edit()
     ke.save_results()

@@ -9,12 +9,14 @@ import random
 from Dataset.DatasetBuilder import FEW_SHOT, LANGS
 import matplotlib.pyplot as plt
 import numpy as np
+import logging
 random.seed(18)
 
 # ===============================      Global Variables:      ===============================
 
 DATASET_PATH = "Dataset/mke_data.json"
 F1_SUCCESS = 0.4
+DEVICE = 'cuda:0' if torch.cuda.is_available() else "cpu"
 
 
 # ===============================      Global functions:      ===============================
@@ -95,74 +97,95 @@ def annotate_heatmap(im, data=None, textcolors=("black", "white"), threshold=Non
 class KnowledgeEvaluator:
 
     def __init__(self, dataset_path=DATASET_PATH, from_file=None, exp_name=""):
+        self.known = None
         self.model = None
         self.tok = None
         self.dataset = load_json_file(dataset_path)
         # random.shuffle(self.dataset)  # TODO: For debug
         # self.dataset = self.dataset[:130]  # TODO: For debug
         self.exp_name = exp_name
+        self.from_file = from_file
         self.results = from_file if not from_file else pd.read_csv(from_file)
+        if from_file:
+            self.compute_known_facts()
 
-    def eval(self, model_name, bs=1, n_samples=None, fewshot=False, space=False):
+    def eval(self, model_name, bs=1, n_samples=None, fewshot=True, space=False):
+
+        if self.results is None:
+            logging.info(f"Starting {self.exp_name} Evaluation")
+        else:
+            logging.info(f"Resuming evaluation from results {self.from_file}")
+
+        logging.info(f"Loading {model_name} to {DEVICE}")
         self.tok = AutoTokenizer.from_pretrained(model_name, use_fast=False, padding_side="left",
                                                  trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True, torch_dtype=torch.float16,
-                                                          trust_remote_code=True).to('cuda:0')
-
+                                                          trust_remote_code=True).to(DEVICE)
         self.model.eval()
 
-        if self.results is not None:
-            known_ids = list(self.results["id"].values)
-
-        dataset = self.dataset if not n_samples else self.dataset[:n_samples]
-        print_title(f"Start {self.exp_name} evaluation")
+        dataset = self.dataset
+        if n_samples:
+            logging.info(f"Limit evaluation to {n_samples} samples")
+            dataset = self.dataset[:n_samples]
 
         results = []
         for i, sample in tqdm(enumerate(dataset), total=len(dataset)):
 
             sample_id = sample["id"]
-
-            if self.results is not None and sample_id in known_ids:
-                continue
-
             sample_langs = list(sample["prompt"].keys())
-            sample_prompts = [sample["prompt"][lang] for lang in sample_langs]
 
+            # Skip knows fact from previous evaluation
+            if self.from_file is not None:
+                sample_langs = [lang for lang in sample_langs if (sample_id, lang) not in self.known]
+                if not sample_langs:
+                    continue
+
+            # Build prompts and batch for evaluation:
+            sample_prompts = [sample["prompt"][lang] for lang in sample_langs]
             if fewshot:
                 sample_prompts = [FEW_SHOT[sample["rel"]["label"]][sample_langs[i]]["prompt"] + sample_prompts[i] for i
                                   in range(len(sample_prompts))]
             if space:
                 sample_prompts = [prompt + " " for prompt in sample_prompts]
-
             batch_prompt = [sample_prompts[i:i + bs] for i in range(0, len(sample_prompts), bs)]
-            golds = [sample["obj_true"]["label"][lang] for lang in sample_langs]
 
-            s_preds = []
+            # Batch results:
+            sample_golds = [sample["obj_true"]["label"][lang] for lang in sample_langs]
+            sample_preds = []
+
             for batch in batch_prompt:
                 tok_batch = self.tok(batch, return_tensors='pt', padding=True)
                 model_output = self.model.generate(
-                    input_ids=tok_batch['input_ids'].to('cuda:0'),
-                    attention_mask=tok_batch['attention_mask'].to('cuda:0'),
+                    input_ids=tok_batch['input_ids'].to(DEVICE),
+                    attention_mask=tok_batch['attention_mask'].to(DEVICE),
                     max_new_tokens=5
                 )
-                b_preds = [self.tok.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
-                b_preds = [get_prefix(b_preds[i][len(batch[i]):]) for i in range(len(batch))]
-                s_preds += b_preds
-            sample_results = [[sample_id, sample_langs[i], s_preds[i], golds[i]] for i in range(len(sample_langs))]
+                batch_preds = [self.tok.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
+                batch_preds = [get_prefix(batch_preds[i][len(batch[i]):]) for i in range(len(batch))]
+                sample_preds += batch_preds
+            sample_results = [[sample_id, sample_langs[i], sample_preds[i], sample_golds[i]] for i in
+                              range(len(sample_langs))]
             results += sample_results
 
+            # For debug:
+            if len(results) % 200 == 0:
+                msg = "\n"
+                for j in range(len(sample_results)):
+                    msg += f"Evaluation results for {sample_results[j][0]} - {sample_results[j][1]}" + "\n"
+                    msg += f"Prompt: {sample_prompts[j]}" + "\n"
+                    msg += f"Pred: {sample_results[j][2]} gold: {sample_results[j][3]}" + "\n"
+                logging.debug(msg)
+
+        # Assemble results:
         final_results = pd.DataFrame(results, columns=["id", "lang", "pred", "gold"])
         eval_result = evaluate_metrics(final_results["gold"], final_results["pred"])
-        print(f"{self.exp_name} evaluation results: EM {eval_result['exact_match']},  F1: {eval_result['f1']}")
         final_results["F1"] = eval_result['f1_scores']
         final_results["EM"] = eval_result['exact_match_scores']
-
+        self.results_stats(final_results)
         if self.results is not None:
             self.results = pd.concat([self.results, final_results])
         else:
             self.results = final_results
-
-        self.save_results()
 
     def plot_results_by_language(self):
         """ plots the accuracy by language """
@@ -246,24 +269,49 @@ class KnowledgeEvaluator:
             result_mat.loc[lang] = result_mat.loc[lang, :] / result_mat[lang][lang]
         result_mat = result_mat.round(3)
 
+        result_mat['rows_sum'] = result_mat.sum(axis=1)
+        result_mat = result_mat.sort_values(by=['rows_sum'], ascending=False)
+        result_mat = result_mat.drop(["rows_sum"], axis=1)
+        row_labels = result_mat.index.tolist()
+        result_mat = result_mat[row_labels]
+        col_labels = result_mat.columns.tolist()
+
+        # result_mat.loc['column_sum'] = result_mat.sum(axis=0)
+        # result_mat = result_mat.sort_values(by=['column_sum'], axis=1, ascending=False)
+        # result_mat = result_mat.drop(["column_sum"], axis=0)
+
         fig, ax = plt.subplots()
-        im, cbar = heatmap(np.array(result_mat), langs, langs, ax=ax,
+        im, cbar = heatmap(np.array(result_mat), row_labels, col_labels, ax=ax,
                            cmap="YlGn", cbarlabel="(% correct answers column from correct row answers")
         texts = annotate_heatmap(im)
         ax.set_title(f"languages performance relation on {self.exp_name}")
         fig.tight_layout()
         plt.show()
 
+    def compute_known_facts(self):
+        known_ids = self.results[["id", "lang"]]
+        self.known = {tuple(x) for x in known_ids.values}
+
     def save_results(self):
-        self.results.to_csv(f'{self.exp_name}_eval_res.csv', index=False)
+        self.results.to_csv(f'{self.exp_name}_evaluation.csv', index=False)
+
+    def results_stats(self, results=None):
+        results = results if results is not None else self.results
+        msg = "\n"
+        msg += f"Evaluation Results for {self.exp_name}" + "\n"
+        msg += f"Dataset size: {len(results)}" + "\n"
+        for lang in set(results["lang"]):
+            msg += f"{lang}: {len(results[results['lang'] == lang])}, "
+        df_met = results[["F1", "EM"]].mean() * 100
+        msg += f"\nResults- EM: {round(df_met['EM'], 2)} F1: {round(df_met['F1'], 2)}" + "\n"
+        logging.info(msg)
 
 
 def main():
-    ke = KnowledgeEvaluator(exp_name="mke", from_file="mke_first_try_eval_res.csv")
-    ke.eval(model_name="bigscience/bloom-7b1", fewshot=True)
-    ke.save_results()
-    # ke.plot_results_by_language()
-    # ke.plot_languages_relation_performance_mat()
-    # ke.plot_number_of_languages_per_question_by_languages()
+    ke = KnowledgeEvaluator(exp_name="mke", from_file="mke_evaluation.csv")
     # ke.eval(model_name="bigscience/bloom-7b1")
-    # ke.save_results()
+    ke.results_stats()
+    ke.save_results()
+    ke.plot_results_by_language()
+    ke.plot_languages_relation_performance_mat()
+    ke.plot_number_of_languages_per_question_by_languages()
