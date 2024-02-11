@@ -223,6 +223,7 @@ class DatasetBuilder:
     def preprocess(self):
         for sample in self.raw_data:
             self.construct_prompts(sample)
+
         self.target_labels_qid = {rel: list(self.target_labels[rel].keys()) for rel in self.target_labels}
         self.assign_target_labels()
 
@@ -247,7 +248,11 @@ class DatasetBuilder:
         obj_true = {"qid": None if "year" in sample["rel"] else url_to_q_entity(sample["o"]),
                     "label": {lang: str(int(sample["o"])) for lang in object_langs} if "year" in sample["rel"]
                     else {lang: sample[f"o_{lang}"] for lang in sample_lang}}
-        new_sample = {"id": self.id_count,
+
+        if sample["rel"] == "sport_type" and obj_true["qid"] == "Q2736":
+            obj_true["label"]["en"] = "soccer"
+
+        new_sample = {"id": str(self.id_count),
                       "subj": {"label": {lang: sample[f"s_{lang}"] for lang in sample_lang},
                                "qid": url_to_q_entity(sample["s"]),
                                "origin": None if "origin" not in sample else QID2LAND[
@@ -283,6 +288,7 @@ class DatasetBuilder:
                     self.data[i]["target_true"] = self.target_labels[self.data[i]["rel"]['label']][two_op[0]]
                 else:
                     self.data[i]["target_true"] = self.target_labels[self.data[i]["rel"]['label']][two_op[1]]
+
     def save_fewshot_examples(self, out_path="Dataset/fewshots.json"):
         fewshots = {rel: {lang: {"prompt": "", "p1": "", "p2": ""} for lang in LANGS} for rel in RELS.keys()}
         rels_1 = []

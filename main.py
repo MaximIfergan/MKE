@@ -1,7 +1,7 @@
 import Dataset.DatasetBuilder as DatasetBuilder
 import util
-import LingualKnowledgeTranfer.knowledge_evaluator
-# import LingualKnowledgeTranfer.model_editor
+import LingualKnowledgeTransfer.knowledge_evaluator
+# import LingualKnowledgeTransfer.knowledge_editor
 import json
 import logging
 
@@ -19,8 +19,8 @@ def init_logger():
 def main():
     init_logger()
     # DatasetBuilder.main()
-    LingualKnowledgeTranfer.knowledge_evaluator.main()
-    # LingualKnowledgeTranfer.model_editor.main()
+    LingualKnowledgeTransfer.knowledge_evaluator.main()
+    # LingualKnowledgeTransfer.knowledge_editor.main()
 
 
 if __name__ == "__main__":

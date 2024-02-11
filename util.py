@@ -13,7 +13,7 @@ def print_title(title):
 
 def exact_match_score(prediction, ground_truth):
     if (prediction == ""):
-        return False
+        return 0
     return int(normalize_answer(prediction) == normalize_answer(ground_truth))
 
 

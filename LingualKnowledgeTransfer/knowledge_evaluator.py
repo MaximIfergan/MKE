@@ -163,7 +163,7 @@ class KnowledgeEvaluator:
                 batch_preds = [self.tok.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
                 batch_preds = [get_prefix(batch_preds[i][len(batch[i]):]) for i in range(len(batch))]
                 sample_preds += batch_preds
-            sample_results = [[sample_id, sample_langs[i], sample_preds[i], sample_golds[i]] for i in
+            sample_results = [[str(sample_id), sample_langs[i], sample_preds[i], sample_golds[i]] for i in
                               range(len(sample_langs))]
             results += sample_results
 
@@ -186,12 +186,15 @@ class KnowledgeEvaluator:
             self.results = pd.concat([self.results, final_results])
         else:
             self.results = final_results
+        self.append_metadata_info()
 
-    def plot_results_by_language(self):
+    def plot_results_by(self, by="lang", filter=None):
         """ plots the accuracy by language """
         df = self.results
+        if filter:
+            df = df[df[filter["col"]] == filter["value"]]
         all_df = df[["F1", "EM"]].mean() * 100
-        df = df.groupby(["lang"])[["F1", "EM"]].mean() * 100
+        df = df.groupby([by])[["F1", "EM"]].mean() * 100
         labels = ["all"] + list(df.axes[0])
         f1 = [round(all_df["F1"], 2)] + [round(value, 1) for value in df["F1"]]
         em = [round(all_df["EM"], 2)] + [round(value, 1) for value in df["EM"]]
@@ -205,15 +208,21 @@ class KnowledgeEvaluator:
 
         # Add some text for labels, title and custom x-axis tick labels, etc.
         ax.set_ylabel('Scores')
-        ax.set_title(f'Scores By Language {self.exp_name}')
+        if filter is None:
+            ax.set_title(f'Scores by {by} {self.exp_name}')
+        else:
+            ax.set_title(f'Scores by {by} {self.exp_name} with filter: {filter}')
         ax.set_xticks(x, labels)
+        if by == "rel":
+            labels = ax.get_xticklabels()
+            plt.setp(labels, rotation=45, horizontalalignment='right')
         ax.legend()
 
         ax.bar_label(rects1, padding=3)
         ax.bar_label(rects2, padding=3)
 
         fig.tight_layout()
-        plt.ylim(0, 35)
+        plt.ylim(0, max(f1) + 10)
         plt.show()
 
     def plot_number_of_languages_per_question_by_languages(self):
@@ -306,12 +315,25 @@ class KnowledgeEvaluator:
         msg += f"\nResults- EM: {round(df_met['EM'], 2)} F1: {round(df_met['F1'], 2)}" + "\n"
         logging.info(msg)
 
+    def append_metadata_info(self):
+        self.results["rel"] = None
+        self.results["origin"] = "no_origin"
+        for i in self.results.index:
+            s_id = int(self.results.iloc[i]["id"])
+            d_sample = self.dataset[s_id - 1]
+            assert s_id == int(d_sample["id"])
+            self.results._set_value(i, "rel", d_sample["rel"]["label"])
+            self.results._set_value(i, "origin", d_sample["subj"]["origin"])
+
 
 def main():
-    ke = KnowledgeEvaluator(exp_name="mke", from_file="mke_evaluation.csv")
+    ke = KnowledgeEvaluator(exp_name="test_func", from_file="Experiments/17-01-meeting/mke_evaluation.csv")
     # ke.eval(model_name="bigscience/bloom-7b1")
     ke.results_stats()
-    ke.save_results()
-    ke.plot_results_by_language()
-    ke.plot_languages_relation_performance_mat()
-    ke.plot_number_of_languages_per_question_by_languages()
+    ke.append_metadata_info()
+    # ke.plot_results_by("lang", filter={"col": "rel", "value": "geo_continent"})
+    ke.plot_results_by("origin", filter={"col": "lang", "value": "en"})
+    # ke.plot_results_by("rel", filter={"col": "lang", "value": "en"})
+    # ke.save_results()
+    # ke.plot_languages_relation_performance_mat()
+    # ke.plot_number_of_languages_per_question_by_languages()

@@ -1,8 +1,8 @@
-import json
-import pandas as pd
 import EasyEdit
 from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
+import json
+import pandas as pd
 from transformers import AutoTokenizer
 from transformers import AutoModelForCausalLM
 from util import load_json_file, print_title, evaluate_metrics, get_prefix
@@ -270,7 +270,7 @@ class KnowledgeEditor():
         with open(f"{self.exp_name}_edition.json", "w") as outfile:
             json.dump(self.results, outfile)
 
-    def calculate_editing_result_metrics(self):
+    def calculate_editing_result_metrics(self, gen_to_know=True):
 
         results = self.results
         columns = ["acc"]
@@ -289,6 +289,8 @@ class KnowledgeEditor():
             acc_golds[s_lang].append(results[s_edit]["prompt"]["gold"])
             acc_preds[s_lang].append(results[s_edit]["prompt"]["pred"])
             for c_lang in results[s_edit]["gen"].keys():
+                if gen_to_know and (int(s_id), c_lang) not in self.known_facts:
+                    continue
                 gen_golds[s_lang][c_lang] += [p["gold"] for p in results[s_edit]["gen"][c_lang]]
                 gen_preds[s_lang][c_lang] += [p["pred"] for p in results[s_edit]["gen"][c_lang]]
 
@@ -308,9 +310,8 @@ class KnowledgeEditor():
         self.final_results = final_results
         final_results.to_csv(f"{self.exp_name}_edition_metrics.csv")
 
-
 def main():
-    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="mke",
-                         eval_results_path="mke_evaluation.csv")
-    ke.edit()
-    ke.save_results()
+    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="test_not_gen_to_know",
+                         eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv", from_file="Experiments/17-01-meeting/mke_edition.json")
+    # ke.edit()
+    ke.calculate_editing_result_metrics(gen_to_know=False)
