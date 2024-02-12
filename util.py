@@ -64,7 +64,7 @@ def load_json_file(output_file):
 def evaluate_metrics(gold_answers, predictions):
     if not gold_answers:
         logging.error("evaluate_metrics got empty args")
-        return {'exact_match': [], 'f1': [], 'f1_scores': 0, 'exact_match_scores': 0}
+        return {'exact_match': 0, 'f1': 0, 'f1_scores': [], 'exact_match_scores': []}
     f1 = exact_match = total = 0
     f1_scores = []
     exact_match_scores = []

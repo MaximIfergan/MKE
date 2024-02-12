@@ -256,7 +256,7 @@ class KnowledgeEditor():
         self.known_facts = [tuple(x) for x in known_ids.values]
 
         # TODO delete only for debug
-        self.known_facts = [x for x in self.known_facts if x[0] in ["en", "fr", "ar"]]
+        self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr", "ar"]]
 
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
