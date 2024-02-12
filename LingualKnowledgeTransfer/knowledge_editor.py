@@ -211,6 +211,8 @@ class KnowledgeEditor():
 
                 # TODO delete only for debug
                 batch_sents = [e[1] for e in batch if e[0].split("_")[0] in ["en", "fr", "ar"]]
+                if not batch_sents:
+                    continue
                 # batch_sents = [e[1] for e in batch]
 
                 batch_tok = tokenizer(batch_sents, return_tensors='pt', padding=True)
