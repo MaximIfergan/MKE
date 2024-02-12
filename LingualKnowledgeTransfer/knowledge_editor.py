@@ -195,7 +195,8 @@ class KnowledgeEditor():
 
             if fewshot:
                 sample_eval = [(x[0], FEW_SHOT[dataset_sample["rel"]["label"]][x[0].split("_")[0]]["prompt"] + x[1])
-                               for x in sample_eval]
+                               for x in sample_eval[1:]]
+                sample_eval = [(f"{sample_lang}_prompt", dataset_sample["prompt"][sample_lang])] + sample_eval
 
             # locality:
 
@@ -208,7 +209,10 @@ class KnowledgeEditor():
             # = eval all:
             for batch in batch_eval:
 
-                batch_sents = [e[1] for e in batch]
+                # TODO delete only for debug
+                batch_sents = [e[1] for e in batch if e[0].split("_")[0] in ["en", "fr", "ar"]]
+                # batch_sents = [e[1] for e in batch]
+
                 batch_tok = tokenizer(batch_sents, return_tensors='pt', padding=True)
                 model_output = edited_model.generate(
                     input_ids=batch_tok['input_ids'].to('cuda:0'),
@@ -216,7 +220,7 @@ class KnowledgeEditor():
                     max_new_tokens=5
                 )
                 text_output = [tokenizer.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
-                text_output = [get_prefix(text_output[i][len(batch_sents[i]):]) for i in range(len(batch_sents))]
+                text_output = [get_prefix(text_output[i][len(batch_sents[i]) + 1:]) for i in range(len(batch_sents))]
 
                 # = save batch eval:
                 for j in range(len(batch)):
@@ -235,11 +239,13 @@ class KnowledgeEditor():
 
             # Print edit example for debug:
             if i % 20 == 0:
-                msg = f"Editing example for {sample_id} in {sample_lang}:\n"
+                msg = "===                                      ==="
+                msg += f"Editing example for {sample_id} in {sample_lang}:\n"
                 msg += f"{ground_truth} -> {target_new}: {dataset_sample['prompt'][sample_lang]}\n"
                 msg += f"Prompt results: {results[res_key]['prompt']['pred']}\n"
-                msg += "Generalization results: " + str(results[res_key]["gen"]) + "\n"
-                msg += "Locality results: " + str(results[res_key]["loc"])
+                msg += "Generalization results:\n" + str(results[res_key]["gen"]) + "\n"
+                msg += "Locality results:\n" + str(results[res_key]["loc"]) + "\n"
+                msg += "===                                      ==="
                 logging.info(msg)
 
         self.results = results
@@ -248,6 +254,10 @@ class KnowledgeEditor():
         eval_known_facts = self.eval_results[self.eval_results['F1'] >= F1_SUCCESS]
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = [tuple(x) for x in known_ids.values]
+
+        # TODO delete only for debug
+        self.known_facts = [x for x in self.known_facts if x[0] in ["en", "fr", "ar"]]
+
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
         df_suc = self.eval_results[self.eval_results['F1'] > F1_SUCCESS].sample(frac=1)
@@ -272,6 +282,8 @@ class KnowledgeEditor():
             json.dump(self.results, outfile)
 
     def calculate_editing_result_metrics(self, gen_to_know=True):
+
+        LANGS = ["en", "fr", "ar"] # TODO delete only for debug
 
         results = self.results
         columns = ["acc"]
