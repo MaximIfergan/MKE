@@ -241,7 +241,7 @@ class KnowledgeEditor():
 
             # Print edit example for debug:
             if i % 20 == 0:
-                msg = "===                                      ==="
+                msg = "===                                      ===\n"
                 msg += f"Editing example for {sample_id} in {sample_lang}:\n"
                 msg += f"{ground_truth} -> {target_new}: {dataset_sample['prompt'][sample_lang]}\n"
                 msg += f"Prompt results: {results[res_key]['prompt']['pred']}\n"
@@ -329,5 +329,5 @@ class KnowledgeEditor():
 def main():
     ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="bloom_hp_init",
                          eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv")
-    ke.edit(n_samples=100)
+    ke.edit(n_samples=60)
     ke.calculate_editing_result_metrics(gen_to_know=False)
