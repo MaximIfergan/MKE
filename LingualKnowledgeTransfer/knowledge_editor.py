@@ -145,16 +145,16 @@ class KnowledgeEditor():
                 size_info[sample_lang] = 1
             else:
                 size_info[sample_lang] += 1
-        msg = f"Edition dataset sizes:\nTotal size: {len(known_facts)} -"
-        msg += ", ".join([f"{lang}: {size_info}" for lang in size_info])
+        msg = f"Edition dataset sizes:\nTotal size: {len(known_facts)} -\n"
+        msg += str(size_info)
         logging.info(msg)
 
         # Start editing
         for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
 
             # === save temp results in crash case:
-            if i % 100 == 0:
-                logging.info(f"Saving backup at step {i} to {self.exp_name}.json")
+            if i != 0 and i % 100 == 0:
+                logging.info(f"Saving edition results back-up at step {i} to {self.exp_name}.json")
                 self.results = results
                 with open(f"{self.exp_name}.json", "w") as outfile:
                     json.dump(self.results, outfile)
