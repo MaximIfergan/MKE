@@ -134,7 +134,8 @@ class KnowledgeEditor():
         known_facts = self.known_facts
         if n_samples:
             logging.info(f"Limit edition to {n_samples} samples")
-            known_facts = self.known_facts[:n_samples]
+            known_facts = random.shuffle(self.known_facts)
+            known_facts = known_facts[:n_samples]
 
         # Print dataset info:
         size_info = dict()
@@ -233,7 +234,7 @@ class KnowledgeEditor():
                                                            "gold": batch[j][2]}
 
             # Print edit example for debug:
-            if i % 50 == 0:
+            if i % 20 == 0:
                 msg = f"Editing example for {sample_id} in {sample_lang}:\n"
                 msg += f"{ground_truth} -> {target_new}: {dataset_sample['prompt'][sample_lang]}\n"
                 msg += f"Prompt results: {results[res_key]['prompt']['pred']}\n"
@@ -310,8 +311,9 @@ class KnowledgeEditor():
         self.final_results = final_results
         final_results.to_csv(f"{self.exp_name}_edition_metrics.csv")
 
+
 def main():
-    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="test_not_gen_to_know",
-                         eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv", from_file="Experiments/17-01-meeting/mke_edition.json")
-    # ke.edit()
+    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="bloom_hp_init",
+                         eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv")
+    ke.edit(n_samples=100)
     ke.calculate_editing_result_metrics(gen_to_know=False)
