@@ -327,7 +327,7 @@ class KnowledgeEditor():
 
 
 def main():
-    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="bloom_hp_2",
+    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="bloom_hp_3",
                          eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv")
     ke.edit(n_samples=33)
     ke.calculate_editing_result_metrics(gen_to_know=False)
