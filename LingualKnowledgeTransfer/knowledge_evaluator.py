@@ -126,7 +126,9 @@ class KnowledgeEvaluator:
         dataset = self.dataset
         if n_samples:
             logging.info(f"Limit evaluation to {n_samples} samples")
-            dataset = self.dataset[:n_samples]
+            dataset = self.dataset
+            random.shuffle(dataset)
+            dataset = dataset[:n_samples]
 
         results = []
         for i, sample in tqdm(enumerate(dataset), total=len(dataset)):
@@ -327,12 +329,14 @@ class KnowledgeEvaluator:
 
 
 def main():
-    ke = KnowledgeEvaluator(exp_name="test_func", from_file="Experiments/17-01-meeting/mke_evaluation.csv")
-    # ke.eval(model_name="bigscience/bloom-7b1")
-    ke.results_stats()
-    ke.append_metadata_info()
+    for model_name in ["Qwen/Qwen-7B", "bigscience/bloom-7b1", "meta-llama/Llama-2-7b"]:
+        ke = KnowledgeEvaluator(exp_name=f"model_try_{model_name}")
+        ke.eval(model_name="", n_samples=200)
+        ke.results_stats()
+
+    # ke.append_metadata_info()
     # ke.plot_results_by("lang", filter={"col": "rel", "value": "geo_continent"})
-    ke.plot_results_by("origin", filter={"col": "lang", "value": "en"})
+    # ke.plot_results_by("origin", filter={"col": "lang", "value": "en"})
     # ke.plot_results_by("rel", filter={"col": "lang", "value": "en"})
     # ke.save_results()
     # ke.plot_languages_relation_performance_mat()
