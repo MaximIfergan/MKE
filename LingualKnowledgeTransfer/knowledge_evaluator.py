@@ -120,7 +120,7 @@ class KnowledgeEvaluator:
         self.tok = AutoTokenizer.from_pretrained(model_name, use_fast=False, padding_side="left",
                                                  trust_remote_code=True)
         if model_name == "Qwen/Qwen-7B":
-            self.tok.add_special_tokens({'pad_token': '[PAD]'})
+            self.tok.pad_token = "<|endoftext|>"
 
         self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True,
                                                           torch_dtype=torch.float16,      # For BLOOM cancel '#'
