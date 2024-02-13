@@ -184,7 +184,7 @@ class KnowledgeEvaluator:
 
         # Assemble results:
         final_results = pd.DataFrame(results, columns=["id", "lang", "pred", "gold"])
-        eval_result = evaluate_metrics(final_results["gold"], final_results["pred"])
+        eval_result = evaluate_metrics(list(final_results["gold"]), list(final_results["pred"]))
         final_results["F1"] = eval_result['f1_scores']
         final_results["EM"] = eval_result['exact_match_scores']
         self.results_stats(final_results)
@@ -335,7 +335,7 @@ class KnowledgeEvaluator:
 def main():
     for model_name in ["Qwen/Qwen-7B", "meta-llama/Llama-2-7b", "bigscience/bloom-7b1"]:
         ke = KnowledgeEvaluator(exp_name=f"model_try_{model_name}")
-        ke.eval(model_name=model_name, n_samples=200)
+        ke.eval(model_name=model_name, n_samples=20)
         ke.results_stats()
 
     # ke.append_metadata_info()
