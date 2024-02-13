@@ -330,8 +330,8 @@ class KnowledgeEvaluator:
 
 
 def main():
-    # "Qwen/Qwen-7B", "bigscience/bloom-7b1",
-    for model_name in ["meta-llama/Llama-2-7b"]:
+    # "Qwen/Qwen-7B", "bigscience/bloom-7b1", "meta-llama/Llama-2-7b"
+    for model_name in ["bigscience/bloom-7b1"]:
         ke = KnowledgeEvaluator(exp_name=f"model_try_{model_name}")
         ke.eval(model_name="", n_samples=200)
         ke.results_stats()
