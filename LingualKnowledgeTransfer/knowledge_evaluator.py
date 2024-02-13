@@ -120,7 +120,7 @@ class KnowledgeEvaluator:
         self.tok = AutoTokenizer.from_pretrained(model_name, use_fast=False, padding_side="left",
                                                  trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True,
-                                                          # torch_dtype=torch.float16,      # For BLOOM cancel '#'
+                                                          torch_dtype=torch.float16,      # For BLOOM cancel '#'
                                                           trust_remote_code=True).to(DEVICE)
         self.model.eval()
 
@@ -330,7 +330,8 @@ class KnowledgeEvaluator:
 
 
 def main():
-    for model_name in ["Qwen/Qwen-7B", "bigscience/bloom-7b1", "meta-llama/Llama-2-7b"]:
+    # "Qwen/Qwen-7B", "bigscience/bloom-7b1",
+    for model_name in ["meta-llama/Llama-2-7b"]:
         ke = KnowledgeEvaluator(exp_name=f"model_try_{model_name}")
         ke.eval(model_name="", n_samples=200)
         ke.results_stats()
