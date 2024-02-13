@@ -192,7 +192,7 @@ class KnowledgeEvaluator:
             self.results = pd.concat([self.results, final_results])
         else:
             self.results = final_results
-        self.append_metadata_info()
+        # self.append_metadata_info()
 
     def plot_results_by(self, by="lang", filter=None):
         """ plots the accuracy by language """
