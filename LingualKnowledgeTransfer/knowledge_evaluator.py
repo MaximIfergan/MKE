@@ -119,7 +119,8 @@ class KnowledgeEvaluator:
         logging.info(f"Loading {model_name} to {DEVICE}")
         self.tok = AutoTokenizer.from_pretrained(model_name, use_fast=False, padding_side="left",
                                                  trust_remote_code=True)
-        self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True, torch_dtype=torch.float16,
+        self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True,
+                                                          # torch_dtype=torch.float16,      # For BLOOM cancel '#'
                                                           trust_remote_code=True).to(DEVICE)
         self.model.eval()
 
