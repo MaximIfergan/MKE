@@ -1,5 +1,4 @@
 import torch.cuda
-
 import EasyEdit
 from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
@@ -119,7 +118,7 @@ class KnowledgeEditor():
         self.compute_known_facts()
         self.build_locality_prompts()
 
-    def edit(self, bs=1, n_samples=None, fewshot=True):
+    def edit(self, bs=1, n_samples=None, fewshot=True, checkpoint=True):
 
         if self.from_file is None:
             logging.info(f"Starting {self.exp_name} editing")
@@ -163,11 +162,10 @@ class KnowledgeEditor():
         for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
 
             # === save temp results in crash case:
-            if i != 0 and i % 20 == 0:
+            if i != 0 and checkpoint and i % 20 == 0:
                 logging.info(f"Saving edition results back-up at step {i} to {self.exp_name}.json")
                 self.results = results
-                with open(f"{self.exp_name}.json", "w") as outfile:
-                    json.dump(self.results, outfile)
+                self.save_results()
 
             # === init params:
             sample_id, sample_lang = sample
@@ -260,6 +258,8 @@ class KnowledgeEditor():
                 msg += "===                                      ==="
                 logging.info(msg)
 
+            torch.cuda.empty_cache()
+
         self.results = results
 
     def compute_known_facts(self):
@@ -269,7 +269,6 @@ class KnowledgeEditor():
 
         # # TODO delete only for debug
         # self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr", "ar"]]
-
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
         df_suc = self.eval_results[self.eval_results['F1'] > F1_SUCCESS].sample(frac=1)
@@ -338,7 +337,7 @@ class KnowledgeEditor():
 
 def main():
     ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name="first_try_qwen",
-                         eval_results_path="model_try_Qwen-7B_evaluation.csv")
+                         eval_results_path="model_try_Qwen-7B_evaluation.csv", from_file="first_try_qwen.json")
     ke.edit(n_samples=200)
     ke.save_results()
     ke.calculate_editing_result_metrics(gen_to_know=False)
