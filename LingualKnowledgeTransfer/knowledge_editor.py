@@ -139,6 +139,8 @@ class KnowledgeEditor():
             hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/qwen-7b.yaml')
             tokenizer.pad_token = "<|endoftext|>"
 
+        editor = BaseEditor.from_hparams(hparams)
+
         known_facts = self.known_facts
         if n_samples:
             logging.info(f"Limit edition to {n_samples} samples")
@@ -179,7 +181,6 @@ class KnowledgeEditor():
             ground_truth = dataset_sample["obj_true"]["label"][sample_lang]
             target_new = dataset_sample["target_true"]["label"][sample_lang]
 
-            editor = BaseEditor.from_hparams(hparams)
             metrics, edited_model, _ = editor.edit(
                 prompts=dataset_sample["prompt"][sample_lang],
                 ground_truth=ground_truth,
