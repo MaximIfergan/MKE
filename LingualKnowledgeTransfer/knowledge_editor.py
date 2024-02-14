@@ -272,7 +272,7 @@ class KnowledgeEditor():
         eval_known_facts = self.eval_results[self.eval_results['F1'] >= F1_SUCCESS]
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = [tuple(x) for x in known_ids.values]
-
+        
         # # TODO delete only for debug
         # self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr", "ar"]]
 

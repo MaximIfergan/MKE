@@ -335,14 +335,14 @@ class KnowledgeEvaluator:
 def main():
     # "Qwen/Qwen-7B", "meta-llama/Llama-2-7b", "bigscience/bloom-7b1"
     #for model_name in ["Qwen/Qwen-7B"]:
-    ke = KnowledgeEvaluator(exp_name=f"exames", from_file="model_try_Qwen-7B_evaluation.csv")
-    # ke.eval(model_name="model_name", n_samples=500)
-    # ke.save_results()
-    ke.append_metadata_info()
-    ke.plot_results_by("lang")
-    ke.plot_results_by("rel")
+    ke = KnowledgeEvaluator(exp_name=f"qwen", from_file="model_try_Qwen-7B_evaluation.csv")
+    ke.eval(model_name="Qwen/Qwen-7B", n_samples=20)
+    ke.save_results()
+    # ke.append_metadata_info()
+    # ke.plot_results_by("lang")
+    # ke.plot_results_by("rel")
     # ke.plot_results_by("lang", filter={"col": "rel", "value": "geo_continent"})
     # ke.plot_results_by("origin", filter={"col": "lang", "value": "en"})
     # ke.plot_results_by("rel", filter={"col": "lang", "value": "en"})
     # ke.plot_languages_relation_performance_mat()
-    ke.plot_number_of_languages_per_question_by_languages()
+    # ke.plot_number_of_languages_per_question_by_languages()
