@@ -145,8 +145,8 @@ class KnowledgeEditor():
         known_facts = self.known_facts
         if n_samples:
             logging.info(f"Limit edition to {n_samples} samples")
-            random.shuffle(self.known_facts)
             known_facts = self.known_facts[:n_samples]
+        random.shuffle(self.known_facts)
 
         # Print dataset info:
         size_info = dict()
@@ -166,7 +166,7 @@ class KnowledgeEditor():
             editor = BaseEditor.from_hparams(hparams)
 
             # === save temp results in crash case:
-            if i != 0 and checkpoint and i % 2 == 0:
+            if i != 0 and checkpoint and i % 100 == 0:
                 logging.info(f"Saving edition results back-up at step {i} to {self.exp_name}.json")
                 self.results = results
                 self.save_results()
@@ -344,7 +344,7 @@ class KnowledgeEditor():
 
 def main():
     ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name="qwen",
-                         eval_results_path="qwen_evaluation.csv")
-    ke.edit(n_samples=6)
+                         eval_results_path="qwen_evaluation.csv", from_file="qwen_edition.json")
+    ke.edit()
     ke.save_results()
     ke.calculate_editing_result_metrics(gen_to_know=False)
