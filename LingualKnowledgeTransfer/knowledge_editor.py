@@ -163,8 +163,6 @@ class KnowledgeEditor():
         # Start editing
         for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
 
-            editor = BaseEditor.from_hparams(hparams)
-
             # === save temp results in crash case:
             if i != 0 and checkpoint and i % 20 == 0:
                 logging.info(f"Saving edition results back-up at step {i} to {self.exp_name}.json")
@@ -179,10 +177,11 @@ class KnowledgeEditor():
             dataset_sample = self.dataset[sample_id - 1]
             results[res_key] = {"prompt": None, "gen": dict(), "loc": dict()}
 
+
             # === edit:
             ground_truth = dataset_sample["obj_true"]["label"][sample_lang]
             target_new = dataset_sample["target_true"]["label"][sample_lang]
-
+            editor = BaseEditor.from_hparams(hparams)
             metrics, edited_model, _ = editor.edit(
                 prompts=dataset_sample["prompt"][sample_lang],
                 ground_truth=ground_truth,
