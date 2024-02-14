@@ -146,7 +146,7 @@ class KnowledgeEditor():
         if n_samples:
             logging.info(f"Limit edition to {n_samples} samples")
             known_facts = self.known_facts[:n_samples]
-        random.shuffle(self.known_facts)
+        # random.shuffle(self.known_facts)
 
         # Print dataset info:
         size_info = dict()
