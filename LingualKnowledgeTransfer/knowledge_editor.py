@@ -2,6 +2,7 @@ import torch.cuda
 import EasyEdit
 from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
+from EasyEdit.easyeditor import MEMITHyperParams
 import json
 import pandas as pd
 from transformers import AutoTokenizer
@@ -136,7 +137,7 @@ class KnowledgeEditor():
         if 'bloom' in self.model_name.lower():
             hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
         if 'qwen' in self.model_name.lower():
-            hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/qwen-7b.yaml')
+            hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
             tokenizer.pad_token = "<|endoftext|>"
 
         known_facts = self.known_facts
