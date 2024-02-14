@@ -1,3 +1,5 @@
+import torch.cuda
+
 import EasyEdit
 from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
@@ -256,6 +258,8 @@ class KnowledgeEditor():
                 msg += "Locality results:\n" + str(results[res_key]["loc"]) + "\n"
                 msg += "===                                      ==="
                 logging.info(msg)
+
+            torch.cuda.empty_cache()
 
         self.results = results
 
