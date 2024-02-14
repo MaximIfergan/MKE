@@ -163,7 +163,7 @@ class KnowledgeEditor():
         for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
 
             # === save temp results in crash case:
-            if i != 0 and i % 100 == 0:
+            if i != 0 and i % 2 == 0:
                 logging.info(f"Saving edition results back-up at step {i} to {self.exp_name}.json")
                 self.results = results
                 with open(f"{self.exp_name}.json", "w") as outfile:
@@ -260,8 +260,6 @@ class KnowledgeEditor():
                 msg += "===                                      ==="
                 logging.info(msg)
 
-            torch.cuda.empty_cache()
-
         self.results = results
 
     def compute_known_facts(self):
@@ -341,6 +339,6 @@ class KnowledgeEditor():
 def main():
     ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name="first_try_qwen",
                          eval_results_path="model_try_Qwen-7B_evaluation.csv")
-    ke.edit()
+    ke.edit(n_samples=10)
     ke.save_results()
     ke.calculate_editing_result_metrics(gen_to_know=False)
