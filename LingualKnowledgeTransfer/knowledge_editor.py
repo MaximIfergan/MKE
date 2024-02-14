@@ -272,7 +272,7 @@ class KnowledgeEditor():
         eval_known_facts = self.eval_results[self.eval_results['F1'] >= F1_SUCCESS]
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = [tuple(x) for x in known_ids.values]
-        
+
         # # TODO delete only for debug
         # self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr", "ar"]]
 
@@ -343,8 +343,8 @@ class KnowledgeEditor():
 
 
 def main():
-    ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name="first_try_qwen_for_loc",
-                         eval_results_path="model_try_Qwen-7B_evaluation.csv")
-    ke.edit(n_samples=100)
+    ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name="qwen",
+                         eval_results_path="qwen_evaluation.csv")
+    ke.edit(n_samples=10)
     ke.save_results()
     ke.calculate_editing_result_metrics(gen_to_know=False)

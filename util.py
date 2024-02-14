@@ -33,7 +33,8 @@ def normalize_answer(s):
 
     def lower(text):
         return text.lower()
-
+    if str(s) == "nan":
+        return ""
     return white_space_fix(remove_articles(remove_punc(lower(s))))
 
 

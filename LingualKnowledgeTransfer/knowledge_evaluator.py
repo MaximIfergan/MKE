@@ -10,6 +10,7 @@ from Dataset.DatasetBuilder import FEW_SHOT, LANGS
 import matplotlib.pyplot as plt
 import numpy as np
 import logging
+
 random.seed(18)
 
 # ===============================      Global Variables:      ===============================
@@ -20,7 +21,6 @@ DEVICE = 'cuda:0' if torch.cuda.is_available() else "cpu"
 
 
 # ===============================      Global functions:      ===============================
-
 
 def heatmap(data, row_labels, col_labels, ax=None,
             cbar_kw=None, cbarlabel="", **kwargs):
@@ -105,7 +105,7 @@ class KnowledgeEvaluator:
         # self.dataset = self.dataset[:130]  # TODO: For debug
         self.exp_name = exp_name
         self.from_file = from_file
-        self.results = from_file if not from_file else pd.read_csv(from_file)
+        self.results = from_file if not from_file else pd.read_csv(from_file, encoding='utf8')
         if from_file:
             self.compute_known_facts()
 
@@ -123,7 +123,7 @@ class KnowledgeEvaluator:
             self.tok.pad_token = "<|endoftext|>"
 
         self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True,
-                                                          torch_dtype=torch.float16,      # For BLOOM cancel '#'
+                                                          torch_dtype=torch.float16,  # For BLOOM cancel '#'
                                                           trust_remote_code=True).to(DEVICE)
         self.model.eval()
 
@@ -137,6 +137,12 @@ class KnowledgeEvaluator:
         results = []
         for i, sample in tqdm(enumerate(dataset), total=len(dataset)):
 
+            # Skip knows fact from previous evaluation
+            if self.from_file is not None:
+                sample_langs = [lang for lang in sample_langs if (sample_id, lang) not in self.known]
+                if not sample_langs:
+                    continue
+
             if checkpoint and i != 0 and i % 100 == 0:
                 logging.info(f"Saving evaluation results back-up at step {i} to {self.exp_name}_evaluation.csv")
                 final_results = pd.DataFrame(results, columns=["id", "lang", "pred", "gold"])
@@ -148,12 +154,6 @@ class KnowledgeEvaluator:
 
             sample_id = sample["id"]
             sample_langs = list(sample["prompt"].keys())
-
-            # Skip knows fact from previous evaluation
-            if self.from_file is not None:
-                sample_langs = [lang for lang in sample_langs if (sample_id, lang) not in self.known]
-                if not sample_langs:
-                    continue
 
             # Build prompts and batch for evaluation:
             sample_prompts = [sample["prompt"][lang] for lang in sample_langs]
@@ -343,13 +343,18 @@ class KnowledgeEvaluator:
 
 def main():
     # "Qwen/Qwen-7B", "meta-llama/Llama-2-7b", "bigscience/bloom-7b1"
-    #for model_name in ["Qwen/Qwen-7B"]:
+    # for model_name in ["Qwen/Qwen-7B"]:
     ke = KnowledgeEvaluator(exp_name=f"qwen", from_file="qwen_evaluation.csv")
-    ke.eval(model_name="Qwen/Qwen-7B", n_samples=8000)
-    ke.save_results()
+    # eval_result = evaluate_metrics(list(ke.results["gold"]), list(ke.results["pred"]))
+    # ke.results["F1"] = eval_result['f1_scores']
+    # ke.results["EM"] = eval_result['exact_match_scores']
     # ke.append_metadata_info()
-    # ke.plot_results_by("lang")
-    # ke.plot_results_by("rel")
+    # # ke.eval(model_name="Qwen/Qwen-7B", n_samples=0)
+    # ke.save_results()
+
+    # ke.append_metadata_info()
+    ke.plot_results_by("lang")
+    ke.plot_results_by("rel")
     # ke.plot_results_by("lang", filter={"col": "rel", "value": "geo_continent"})
     # ke.plot_results_by("origin", filter={"col": "lang", "value": "en"})
     # ke.plot_results_by("rel", filter={"col": "lang", "value": "en"})
