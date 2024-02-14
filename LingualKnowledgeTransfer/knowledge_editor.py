@@ -262,6 +262,7 @@ class KnowledgeEditor():
                 msg += "===                                      ==="
                 logging.info(msg)
 
+            del editor
             del edited_model
             torch.cuda.empty_cache()
 
