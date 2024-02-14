@@ -1,6 +1,8 @@
 import util
 import pandas as pd
 
+data = util.load_json_file("Experiments/17-01-meeting/mke_edition.json")[0]
+
 count_dict = dict()
 data = util.load_json_file("Experiments/17-01-meeting/mke_edition.json")[0]
 
