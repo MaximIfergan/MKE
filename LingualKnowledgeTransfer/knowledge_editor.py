@@ -107,6 +107,7 @@ def simple_edit_example():
 class KnowledgeEditor():
 
     def __init__(self, model_name, eval_results_path, from_file=None, dataset_path=DATASET_PATH, exp_name=""):
+        self.locality_prompts = None
         self.final_results = None
         self.known_facts = None
         self.from_file = from_file
@@ -138,8 +139,6 @@ class KnowledgeEditor():
             hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/qwen-7b.yaml')
             tokenizer.pad_token = "<|endoftext|>"
 
-        editor = BaseEditor.from_hparams(hparams)
-
         known_facts = self.known_facts
         if n_samples:
             logging.info(f"Limit edition to {n_samples} samples")
@@ -160,6 +159,8 @@ class KnowledgeEditor():
 
         # Start editing
         for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
+
+            editor = BaseEditor.from_hparams(hparams)
 
             # === save temp results in crash case:
             if i != 0 and checkpoint and i % 20 == 0:
@@ -280,9 +281,10 @@ class KnowledgeEditor():
                 continue
             else:
                 dataset_sample = self.dataset[s_id - 1]
+                assert int(dataset_sample["id"]) == int(s_id)
+                prompt = dataset_sample["prompt"][s_lang]
                 if fewshot:
-                    prompt = FEW_SHOT[dataset_sample["rel"]["label"]][s_lang]["prompt"] + dataset_sample["prompt"][
-                        s_lang]
+                    prompt = FEW_SHOT[dataset_sample["rel"]["label"]][s_lang]["prompt"] + prompt
                 locality_prompts[s_lang].append((s_id, prompt, df_suc['pred'][ind]))
         self.locality_prompts = locality_prompts
         # with open(f"{self.exp_name}_locality_prompts.json", "w") as outfile:
@@ -336,8 +338,8 @@ class KnowledgeEditor():
 
 
 def main():
-    ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name="first_try_qwen",
-                         eval_results_path="model_try_Qwen-7B_evaluation.csv", from_file="first_try_qwen.json")
-    ke.edit(n_samples=200)
+    ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name="first_try_qwen_for_loc",
+                         eval_results_path="model_try_Qwen-7B_evaluation.csv")
+    ke.edit(n_samples=100)
     ke.save_results()
     ke.calculate_editing_result_metrics(gen_to_know=False)
