@@ -264,7 +264,7 @@ class KnowledgeEditor():
 
             del editor
             del edited_model
-            torch.cuda.empty_cache()
+            # torch.cuda.empty_cache()
 
         self.results = results
 
