@@ -336,7 +336,7 @@ def main():
     # "Qwen/Qwen-7B", "meta-llama/Llama-2-7b", "bigscience/bloom-7b1"
     #for model_name in ["Qwen/Qwen-7B"]:
     ke = KnowledgeEvaluator(exp_name=f"qwen", from_file="qwen_evaluation.csv")
-    ke.eval(model_name="Qwen/Qwen-7B", n_samples=510)
+    ke.eval(model_name="Qwen/Qwen-7B")
     ke.save_results()
     # ke.append_metadata_info()
     # ke.plot_results_by("lang")
