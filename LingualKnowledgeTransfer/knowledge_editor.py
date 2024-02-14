@@ -137,8 +137,10 @@ class KnowledgeEditor():
         if 'bloom' in self.model_name.lower():
             hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
         if 'qwen' in self.model_name.lower():
-            hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
+            hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
             tokenizer.pad_token = "<|endoftext|>"
+            # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
+            # tokenizer.pad_token = "<|endoftext|>"
 
         known_facts = self.known_facts
         if n_samples:
@@ -260,6 +262,8 @@ class KnowledgeEditor():
                 msg += "===                                      ==="
                 logging.info(msg)
 
+            del edited_model
+            torch.cuda.empty_cache()
 
         self.results = results
 
