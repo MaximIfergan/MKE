@@ -160,7 +160,6 @@ class KnowledgeEditor():
         # Start editing
         for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
 
-            del editor
             editor = BaseEditor.from_hparams(hparams)
 
             # === save temp results in crash case:
@@ -260,7 +259,6 @@ class KnowledgeEditor():
                 msg += "===                                      ==="
                 logging.info(msg)
 
-            torch.cuda.empty_cache()
 
         self.results = results
 
