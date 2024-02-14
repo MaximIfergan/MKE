@@ -166,7 +166,7 @@ class KnowledgeEditor():
             editor = BaseEditor.from_hparams(hparams)
 
             # === save temp results in crash case:
-            if i != 0 and checkpoint and i % 100 == 0:
+            if i != 0 and checkpoint and i % 20 == 0:
                 logging.info(f"Saving edition results back-up at step {i} to {self.exp_name}.json")
                 self.results = results
                 self.save_results()
