@@ -133,12 +133,6 @@ class KnowledgeEditor():
 
         logging.info(f"Loading edition HyperParams")
 
-        if 'bloom' in self.model_name.lower():
-            hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
-        if 'qwen' in self.model_name.lower():
-            hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/qwen-7b.yaml')
-            tokenizer.pad_token = "<|endoftext|>"
-
         known_facts = self.known_facts
         if n_samples:
             logging.info(f"Limit edition to {n_samples} samples")
@@ -159,6 +153,12 @@ class KnowledgeEditor():
 
         # Start editing
         for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
+
+            if 'bloom' in self.model_name.lower():
+                hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
+            if 'qwen' in self.model_name.lower():
+                hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/qwen-7b.yaml')
+                tokenizer.pad_token = "<|endoftext|>"
 
             editor = BaseEditor.from_hparams(hparams)
 
