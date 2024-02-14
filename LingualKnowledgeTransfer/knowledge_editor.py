@@ -126,10 +126,16 @@ class KnowledgeEditor():
 
         results = self.results
 
-        logging.info(f"Loading edition HyperParams")
-        hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False, padding_side="left",
                                                   trust_remote_code=True)
+
+        logging.info(f"Loading edition HyperParams")
+
+        if 'bloom' in self.model_name.lower():
+            hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
+        if 'qwen' in self.model_name.lower():
+            hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/qwen-7b.yaml')
+            tokenizer.pad_token = "<|endoftext|>"
 
         known_facts = self.known_facts
         if n_samples:
@@ -209,11 +215,12 @@ class KnowledgeEditor():
             # = eval all:
             for batch in batch_eval:
 
-                # TODO delete only for debug
-                batch_sents = [e[1] for e in batch if e[0].split("_")[0] in ["en", "fr", "ar"]]
-                if not batch_sents:
-                    continue
-                # batch_sents = [e[1] for e in batch]
+                # # TODO delete only for debug
+                # batch_sents = [e[1] for e in batch if e[0].split("_")[0] in ["en", "fr", "ar"]]
+                # if not batch_sents:
+                #     continue
+
+                batch_sents = [e[1] for e in batch]
 
                 batch_tok = tokenizer(batch_sents, return_tensors='pt', padding=True)
                 model_output = edited_model.generate(
@@ -257,8 +264,8 @@ class KnowledgeEditor():
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = [tuple(x) for x in known_ids.values]
 
-        # TODO delete only for debug
-        self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr", "ar"]]
+        # # TODO delete only for debug
+        # self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr", "ar"]]
 
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
@@ -285,7 +292,7 @@ class KnowledgeEditor():
 
     def calculate_editing_result_metrics(self, gen_to_know=True):
 
-        LANGS = ["en", "fr", "ar"] # TODO delete only for debug
+        # LANGS = ["en", "fr", "ar"] # TODO delete only for debug
 
         results = self.results
         columns = ["acc"]
@@ -327,7 +334,8 @@ class KnowledgeEditor():
 
 
 def main():
-    ke = KnowledgeEditor(model_name="bigscience/bloom-7b1", exp_name="bloom_hp_7",
-                         eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv")
-    ke.edit(n_samples=33)
+    ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name="first_try_qwen",
+                         eval_results_path="model_try_Qwen-7B_evaluation.csv")
+    ke.edit()
+    ke.save_results()
     ke.calculate_editing_result_metrics(gen_to_know=False)
