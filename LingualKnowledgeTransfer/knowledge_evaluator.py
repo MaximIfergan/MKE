@@ -137,7 +137,7 @@ class KnowledgeEvaluator:
         results = []
         for i, sample in tqdm(enumerate(dataset), total=len(dataset)):
 
-            if checkpoint and i != 0 and i % 50 == 0:
+            if checkpoint and i != 0 and i % 2 == 0:
                 logging.info(f"Saving evaluation results back-up at step {i} to {self.exp_name}_evaluation.csv")
                 final_results = pd.DataFrame(results, columns=["id", "lang", "pred", "gold"])
                 if self.results is not None:
@@ -345,7 +345,7 @@ def main():
     # "Qwen/Qwen-7B", "meta-llama/Llama-2-7b", "bigscience/bloom-7b1"
     #for model_name in ["Qwen/Qwen-7B"]:
     ke = KnowledgeEvaluator(exp_name=f"qwen", from_file="qwen_evaluation.csv")
-    ke.eval(model_name="Qwen/Qwen-7B", n_samples=7500)
+    ke.eval(model_name="Qwen/Qwen-7B", n_samples=520)
     ke.save_results()
     # ke.append_metadata_info()
     # ke.plot_results_by("lang")
