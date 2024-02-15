@@ -182,13 +182,20 @@ class KnowledgeEditor():
             ground_truth = dataset_sample["obj_true"]["label"][sample_lang]
             target_new = dataset_sample["target_true"]["label"][sample_lang]
             editor = BaseEditor.from_hparams(hparams)
-            metrics, edited_model, _ = editor.edit(
-                prompts=dataset_sample["prompt"][sample_lang],
-                ground_truth=ground_truth,
-                target_new=target_new,
-                subject=dataset_sample['subj']["label"][sample_lang],
-                keep_original_weight=False
-            )
+            try:
+                metrics, edited_model, _ = editor.edit(
+                    prompts=dataset_sample["prompt"][sample_lang],
+                    ground_truth=ground_truth,
+                    target_new=target_new,
+                    subject=dataset_sample['subj']["label"][sample_lang],
+                    keep_original_weight=False
+                )
+            except torch.cuda.OutOfMemoryError:
+                del editor
+                del edited_model
+                torch.cuda.empty_cache()
+                logging.error(f"torch.cuda.OutOfMemoryError for {sample}")
+                continue
 
             # === eval accuracy, generalization, locality:
 
@@ -232,6 +239,8 @@ class KnowledgeEditor():
                     attention_mask=batch_tok['attention_mask'].to('cuda:0'),
                     max_new_tokens=5
                 )
+
+
                 text_output = [tokenizer.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
                 text_output = [get_prefix(text_output[i][len(batch_sents[i]) + 1:]) for i in range(len(batch_sents))]
 
