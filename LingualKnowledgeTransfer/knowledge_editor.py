@@ -192,7 +192,6 @@ class KnowledgeEditor():
                 )
             except torch.cuda.OutOfMemoryError:
                 del editor
-                del edited_model
                 torch.cuda.empty_cache()
                 logging.error(f"torch.cuda.OutOfMemoryError for {sample}")
                 continue
