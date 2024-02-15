@@ -164,7 +164,7 @@ class KnowledgeEditor():
         for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
 
             # === save temp results in crash case:
-            if i != 0 and checkpoint and i % 20 == 0:
+            if i != 0 and checkpoint and i % 2 == 0:
                 logging.info(f"Saving edition results back-up at step {i} to {self.exp_name}.json")
                 self.results = results
                 self.save_results()
@@ -251,7 +251,7 @@ class KnowledgeEditor():
                                                            "gold": batch[j][2]}
 
             # Print edit example for debug:
-            if i % 20 == 0:
+            if i % 2 == 0:
                 msg = "===                                      ===\n"
                 msg += f"Editing example for {sample_id} in {sample_lang}:\n"
                 msg += f"{ground_truth} -> {target_new}: {dataset_sample['prompt'][sample_lang]}\n"
@@ -273,7 +273,10 @@ class KnowledgeEditor():
         self.known_facts = [tuple(x) for x in known_ids.values]
 
         # # TODO delete only for debug
-        # self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr", "ar"]]
+        self.known_facts = [x for x in self.known_facts if x[1] in ["ar", "he", "ru"]]
+        random.shuffle(self.known_facts)
+        random.shuffle(self.known_facts)
+
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
         df_suc = self.eval_results[self.eval_results['F1'] > F1_SUCCESS].sample(frac=1)
