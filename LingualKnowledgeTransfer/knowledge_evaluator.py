@@ -237,7 +237,8 @@ class KnowledgeEvaluator:
         ax.bar_label(rects2, padding=3)
 
         fig.tight_layout()
-        plt.ylim(0, max(f1) + 10)
+        # plt.ylim(0, max(f1) + 10)
+        plt.ylim(0, 50)
         plt.show()
 
     def plot_number_of_languages_per_question_by_languages(self):
@@ -343,8 +344,20 @@ class KnowledgeEvaluator:
 
 def main():
     # "Qwen/Qwen-7B", "meta-llama/Llama-2-7b", "bigscience/bloom-7b1"
-    # for model_name in ["Qwen/Qwen-7B"]:
-    ke = KnowledgeEvaluator(exp_name=f"qwen", from_file="qwen_evaluation.csv")
+    for exp in [("Qwen", "Experiments/12-02-meeting/qwen_evaluation.csv"),
+                ("BLOOM", "Experiments/17-01-meeting/mke_evaluation.csv")]:
+        ke = KnowledgeEvaluator(exp_name=exp[0], from_file=exp[1])
+        if "BLOOM" == exp[0]:
+            ke.append_metadata_info()
+        ke.plot_results_by("lang")
+        ke.plot_results_by("rel")
+        ke.plot_number_of_languages_per_question_by_languages()
+        ke.plot_languages_relation_performance_mat()
+
+    # ke.plot_results_by("lang", filter={"col": "rel", "value": "geo_continent"})
+    # ke.plot_results_by("origin", filter={"col": "lang", "value": "en"})
+    # ke.plot_results_by("rel", filter={"col": "lang", "value": "en"})
+
     # eval_result = evaluate_metrics(list(ke.results["gold"]), list(ke.results["pred"]))
     # ke.results["F1"] = eval_result['f1_scores']
     # ke.results["EM"] = eval_result['exact_match_scores']
@@ -352,11 +365,3 @@ def main():
     # # ke.eval(model_name="Qwen/Qwen-7B", n_samples=0)
     # ke.save_results()
 
-    # ke.append_metadata_info()
-    ke.plot_results_by("lang")
-    ke.plot_results_by("rel")
-    # ke.plot_results_by("lang", filter={"col": "rel", "value": "geo_continent"})
-    # ke.plot_results_by("origin", filter={"col": "lang", "value": "en"})
-    # ke.plot_results_by("rel", filter={"col": "lang", "value": "en"})
-    # ke.plot_languages_relation_performance_mat()
-    # ke.plot_number_of_languages_per_question_by_languages()

@@ -1,7 +1,11 @@
 import util
 import pandas as pd
 
-# data = util.load_json_file("Experiments/17-01-meeting/mke_edition.json")[0]
+data = pd.read_csv("Experiments/12-02-meeting/qwen_evaluation_dup.csv")
+data = data.drop_duplicates()
+data.to_csv("Experiments/12-02-meeting/qwen_evaluation.csv")
+print()
+exit(0)
 
 count_dict = dict()
 data = util.load_json_file("qwen_edition (1).json")[0]
@@ -14,7 +18,6 @@ for key in data:
         count_dict[lang] += 1
 
 print(count_dict)
-exit(0)
 
 data = pd.read_csv("model_try_Qwen-7B_evaluation.csv")
 data = data[data["F1"] > 0.4]

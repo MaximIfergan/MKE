@@ -33,76 +33,6 @@ def get_prefix(input_string):  # TODO: delete duplicate in KE
     # Otherwise, return the prefix of the string until the first '.'
     return input_string[:dot_index]
 
-
-# TODO: delete function:
-def simple_edit_example():
-    hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
-
-    prompts = ["Abraham Lincoln was born in the year of",
-               "Cristiano Ronaldo was born in the year of",
-               "Albert Einstein was born in the year of"]
-
-    ground_truth = ['1809', '1985', '1879']
-
-    target_new = ['1820', '1933', '1849']
-
-    subject = ['Abraham Lincoln', 'Cristiano Ronaldo', 'Albert Einstein']
-
-    # model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-j-6b")
-
-    editor = BaseEditor.from_hparams(hparams)
-    metrics, edited_model, _ = editor.edit(
-        prompts=prompts,
-        ground_truth=ground_truth,
-        target_new=target_new,
-        subject=subject,
-        keep_original_weight=False
-    )
-    print(metrics)
-
-    tokenizer = AutoTokenizer.from_pretrained("bigscience/bloom-7b1", use_fast=False, padding_side="left",
-                                              trust_remote_code=True)
-
-    for p in prompts:
-        batch = tokenizer(p, return_tensors='pt')
-
-        # pre_edit_outputs = model.generate(
-        #     input_ids=batch['input_ids'].to('cuda:0'),
-        #     attention_mask=batch['attention_mask'].to('cuda:0'),
-        #     max_length=20,
-        #     max_new_tokens=8
-        # )
-
-        post_edit_outputs = edited_model.generate(
-            input_ids=batch.input_ids.to('cuda:0'),
-            attention_mask=batch.attention_mask.to('cuda:0'),
-            # max_length=20,
-            max_new_tokens=3
-        )
-
-        print('Post-Edit Outputs: ', tokenizer.decode(post_edit_outputs[0]))
-
-        # print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
-        # print('Post-Edit Outputs: ', [tokenizer.decode(x) for x in post_edit_outputs.detach().cpu().numpy().tolist()])
-
-    prompts = ["Abraham Lincoln est née en l'an",
-               "Cristiano Ronaldo est née en l'an",
-               "Albert Einstein est née en l'an"]
-    tokenizer = AutoTokenizer.from_pretrained("bigscience/bloom-7b1", use_fast=False, padding_side="left",
-                                              trust_remote_code=True)
-    # model = AutoModelForCausalLM.from_pretrained("bigscience/bloom-7b1", low_cpu_mem_usage=True, torch_dtype=torch.float16, trust_remote_code=True).to('cuda:0')
-
-    for p in prompts:
-        batch = tokenizer(p, return_tensors='pt', padding=True, max_length=30)
-        pre_edit_outputs = edited_model.generate(
-            input_ids=batch['input_ids'].to('cuda:0'),
-            attention_mask=batch['attention_mask'].to('cuda:0'),
-            # max_length=20,
-            max_new_tokens=3
-        )
-        print('Pre-Edit Outputs: ', [tokenizer.decode(x) for x in pre_edit_outputs.detach().cpu().numpy().tolist()])
-
-
 # ====================================      Class:      ====================================
 
 class KnowledgeEditor():
@@ -280,11 +210,10 @@ class KnowledgeEditor():
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = [tuple(x) for x in known_ids.values]
 
-        # # TODO delete only for debug
-        self.known_facts = [x for x in self.known_facts if x[1] in ["ar", "he", "ru"]]
-        random.shuffle(self.known_facts)
-        random.shuffle(self.known_facts)
-
+        # # # TODO For debug
+        # self.known_facts = [x for x in self.known_facts if x[1] in ["ar", "he", "ru"]]
+        # random.shuffle(self.known_facts)
+        # random.shuffle(self.known_facts)
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
         df_suc = self.eval_results[self.eval_results['F1'] > F1_SUCCESS].sample(frac=1)
@@ -327,6 +256,9 @@ class KnowledgeEditor():
 
         for s_edit in results.keys():
             s_id, s_lang = s_edit.split("_")
+            if results[s_edit]["prompt"] is None:
+                print(f"check it {s_edit}")
+                continue
             acc_golds[s_lang].append(results[s_edit]["prompt"]["gold"])
             acc_preds[s_lang].append(results[s_edit]["prompt"]["pred"])
             for c_lang in results[s_edit]["gen"].keys():
@@ -348,13 +280,35 @@ class KnowledgeEditor():
             gen_results = [f"EM:{round(r['exact_match'], 2)} / F1:{round(r['f1'], 2)}" for r in gen_results]
             final_results.loc[lang] = [acc] + gen_results + loc_results
 
-        self.final_results = final_results
+        self.final_results = self.add_meta_info(final_results)
+
+        if gen_to_know:
+            final_results.to_csv(f"{self.exp_name}_edition_metrics_gen_to_know.csv")
+            return
+
         final_results.to_csv(f"{self.exp_name}_edition_metrics.csv")
+
+    def add_meta_info(self, final_results):
+        count_dict = dict()
+        for key in self.results:
+            id, lang = key.split("_")
+            if lang not in count_dict:
+                count_dict[lang] = 1
+            else:
+                count_dict[lang] += 1
+        final_results["n_samples"] = 0
+        for lang in LANGS:
+            final_results.loc[lang, "n_samples"] = count_dict[lang]
+        return final_results
 
 
 def main():
-    ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name="qwen",
-                         eval_results_path="qwen_evaluation.csv", from_file="qwen_edition.json")
-    ke.edit()
-    ke.save_results()
-    ke.calculate_editing_result_metrics(gen_to_know=False)
+    for exp in [("Qwen", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv"),
+                ("BLOOM", "Experiments/17-01-meeting/mke_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv")]:
+        ke = KnowledgeEditor(model_name="", exp_name=exp[0],
+                             eval_results_path=exp[2], from_file=exp[1])
+        # ke.edit()
+        # ke.save_results()
+        ke.calculate_editing_result_metrics(gen_to_know=False)
+        ke.calculate_editing_result_metrics(gen_to_know=True)
+
