@@ -113,6 +113,7 @@ class KnowledgeEditor():
             editor = BaseEditor.from_hparams(hparams)
 
             # try:
+            torch.cuda.empty_cache()
             metrics, edited_model, _ = editor.edit(
                 prompts=dataset_sample["prompt"][sample_lang],
                 ground_truth=ground_truth,
