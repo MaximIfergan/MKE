@@ -303,12 +303,13 @@ class KnowledgeEditor():
 
 
 def main():
-    for exp in [("Qwen", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv"),
-                ("BLOOM", "Experiments/17-01-meeting/mke_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv")]:
-        ke = KnowledgeEditor(model_name="", exp_name=exp[0],
-                             eval_results_path=exp[2], from_file=exp[1])
-        # ke.edit()
-        # ke.save_results()
-        ke.calculate_editing_result_metrics(gen_to_know=False)
-        ke.calculate_editing_result_metrics(gen_to_know=True)
+    for exp in [("Qwen", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv")]:
+        ke = KnowledgeEditor(model_name="qwen", exp_name=exp[0],
+                             eval_results_path=exp[2],
+                             # from_file=exp[1]
+                             )
+        ke.edit(n_samples=20)
+        ke.save_results()
+        # ke.calculate_editing_result_metrics(gen_to_know=False)
+        # ke.calculate_editing_result_metrics(gen_to_know=True)
 
