@@ -67,10 +67,10 @@ class KnowledgeEditor():
         if 'bloom' in self.model_name.lower():
             hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
         if 'qwen' in self.model_name.lower():
-            hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
-            tokenizer.pad_token = "<|endoftext|>"
-            # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
+            # hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
             # tokenizer.pad_token = "<|endoftext|>"
+            hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
+            tokenizer.pad_token = "<|endoftext|>"
 
         known_facts = self.known_facts
         if n_samples:
@@ -106,7 +106,6 @@ class KnowledgeEditor():
                 continue
             dataset_sample = self.dataset[sample_id - 1]
             results[res_key] = {"prompt": None, "gen": dict(), "loc": dict()}
-
 
             # === edit:
             ground_truth = dataset_sample["obj_true"]["label"][sample_lang]
