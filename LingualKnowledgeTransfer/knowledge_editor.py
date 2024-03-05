@@ -1,6 +1,6 @@
 import torch.cuda
 import EasyEdit
-import os
+# import os
 from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
 from EasyEdit.easyeditor import MEMITHyperParams
@@ -14,7 +14,7 @@ from Dataset.DatasetBuilder import LANGS, FEW_SHOT
 import random
 import logging
 random.seed(18)
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
+# os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
 # ===============================      Global Variables:      ===============================
 
