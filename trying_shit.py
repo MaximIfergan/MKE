@@ -1,9 +1,9 @@
 import util
 import pandas as pd
+import pickle
 
-data = pd.read_csv("Experiments/12-02-meeting/qwen_evaluation_dup.csv")
-data = data.drop_duplicates()
-data.to_csv("Experiments/12-02-meeting/qwen_evaluation.csv")
+with open('David Rose.pickle', 'rb') as f:
+    loaded_dict = pickle.load(f)
 print()
 exit(0)
 

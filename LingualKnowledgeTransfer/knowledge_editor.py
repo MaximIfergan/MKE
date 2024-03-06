@@ -311,7 +311,7 @@ def main():
                              eval_results_path=exp[2],
                              # from_file=exp[1]
                              )
-        ke.edit(n_samples=20)
+        ke.edit(n_samples=2)
         ke.save_results()
         # ke.calculate_editing_result_metrics(gen_to_know=False)
         # ke.calculate_editing_result_metrics(gen_to_know=True)
