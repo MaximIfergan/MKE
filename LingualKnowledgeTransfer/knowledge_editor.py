@@ -73,7 +73,7 @@ class KnowledgeEditor():
             # hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
             # tokenizer.pad_token = "<|endoftext|>"
 
-            hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/MEMIT/bloom-7b1.yaml')
+            hparams = MEMITHyperParams.from_hparams('EasyEdit/hparams/MEMIT/bloom-7b1.yaml')
             # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
             # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/mistral-7b.yaml")
             # tokenizer.pad_token = "<|endoftext|>"
