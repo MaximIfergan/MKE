@@ -2,8 +2,10 @@ import util
 import pandas as pd
 import pickle
 
-with open('David Rose.pickle', 'rb') as f:
+with open('2170_es.pickle', 'rb') as f:
     loaded_dict = pickle.load(f)
+for key in loaded_dict:
+    upd_matrix = loaded_dict[key][0].unsqueeze(1) @ loaded_dict[key][1].unsqueeze(0)
 print()
 exit(0)
 
