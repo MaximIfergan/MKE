@@ -115,20 +115,20 @@ class KnowledgeEditor():
             target_new = dataset_sample["target_true"]["label"][sample_lang]
             editor = BaseEditor.from_hparams(hparams)
 
-            # try:
-            metrics, edited_model, _ = editor.edit(
-                prompts=dataset_sample["prompt"][sample_lang],
-                ground_truth=ground_truth,
-                target_new=target_new,
-                subject=dataset_sample['subj']["label"][sample_lang],
-                keep_original_weight=False,
-                s_id=res_key
-                )
-            # except torch.cuda.OutOfMemoryError:
-            #     del editor
-            #     torch.cuda.empty_cache()
-            #     logging.error(f"torch.cuda.OutOfMemoryError for {sample}")
-            #     continue
+            try:
+                metrics, edited_model, _ = editor.edit(
+                    prompts=dataset_sample["prompt"][sample_lang],
+                    ground_truth=ground_truth,
+                    target_new=target_new,
+                    subject=dataset_sample['subj']["label"][sample_lang],
+                    keep_original_weight=False,
+                    s_id=res_key
+                    )
+            except torch.cuda.OutOfMemoryError:
+                del editor
+                torch.cuda.empty_cache()
+                logging.error(f"torch.cuda.OutOfMemoryError for {sample}")
+                continue
 
             # === eval accuracy, generalization, locality:
 
@@ -193,7 +193,7 @@ class KnowledgeEditor():
                                                            "gold": batch[j][2]}
 
             # Print edit example for debug:
-            if i % 2 == 0:
+            if i % 20 == 0:
                 msg = "===                                      ===\n"
                 msg += f"Editing example for {sample_id} in {sample_lang}:\n"
                 msg += f"{ground_truth} -> {target_new}: {dataset_sample['prompt'][sample_lang]}\n"
@@ -307,9 +307,10 @@ class KnowledgeEditor():
 
 
 def main():
-    for exp in [("Qwen", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv")]:
-        ke = KnowledgeEditor(model_name="Qwen/Qwen-7B", exp_name=exp[0], eval_results_path=exp[2])
-        ke.edit(n_samples=2)
+    for exp in [("Qwen", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv", "Qwen/Qwen-7B"),
+                ("Bloom", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv", "bigscience/bloom-7b1")]:
+        ke = KnowledgeEditor(model_name=exp[3], exp_name=exp[0], eval_results_path=exp[2])
+        ke.edit()
         ke.save_results()
         # ke.calculate_editing_result_metrics(gen_to_know=False)
         # ke.calculate_editing_result_metrics(gen_to_know=True)
