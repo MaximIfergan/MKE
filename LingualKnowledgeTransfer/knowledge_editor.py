@@ -121,7 +121,8 @@ class KnowledgeEditor():
                 ground_truth=ground_truth,
                 target_new=target_new,
                 subject=dataset_sample['subj']["label"][sample_lang],
-                keep_original_weight=False
+                keep_original_weight=False,
+                s_id=res_key
                 )
             # except torch.cuda.OutOfMemoryError:
             #     del editor
