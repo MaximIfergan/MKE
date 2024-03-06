@@ -312,6 +312,7 @@ def main():
         ke = KnowledgeEditor(model_name=exp[3], exp_name=exp[0], eval_results_path=exp[2])
         ke.edit()
         ke.save_results()
+
         # ke.calculate_editing_result_metrics(gen_to_know=False)
         # ke.calculate_editing_result_metrics(gen_to_know=True)
 
