@@ -70,8 +70,8 @@ class KnowledgeEditor():
             # hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
             hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/MEMIT/bloom-7b1.yaml')
         if 'qwen' in self.model_name.lower():
-            hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
-            # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
+            # hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
+            hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
             tokenizer.pad_token = "<|endoftext|>"
 
 
@@ -308,7 +308,8 @@ class KnowledgeEditor():
 
 def main():
     for exp in [("Qwen", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv", "Qwen/Qwen-7B"),
-                ("Bloom", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv", "bigscience/bloom-7b1")]:
+                # ("Bloom", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv", "bigscience/bloom-7b1")
+                ]:
         ke = KnowledgeEditor(model_name=exp[3], exp_name=exp[0], eval_results_path=exp[2])
         ke.edit()
         ke.save_results()
