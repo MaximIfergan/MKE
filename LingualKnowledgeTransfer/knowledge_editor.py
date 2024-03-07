@@ -307,10 +307,10 @@ class KnowledgeEditor():
 
 
 def main():
-    for exp in [("Qwen", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv", "Qwen/Qwen-7B"),
+    for exp in [("Qwen", "Qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv", "Qwen/Qwen-7B"),
                 # ("Bloom", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv", "bigscience/bloom-7b1")
                 ]:
-        ke = KnowledgeEditor(model_name=exp[3], exp_name=exp[0], eval_results_path=exp[2])
+        ke = KnowledgeEditor(model_name=exp[3], exp_name=exp[0], eval_results_path=exp[2], from_file=exp[1])
         ke.edit()
         ke.save_results()
 
