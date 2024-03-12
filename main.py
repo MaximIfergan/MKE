@@ -7,7 +7,6 @@ import json
 import logging
 import os
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 def init_logger():
     logging.basicConfig(level=logging.INFO,
