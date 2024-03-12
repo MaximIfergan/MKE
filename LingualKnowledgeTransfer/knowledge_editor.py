@@ -1,6 +1,6 @@
 import torch.cuda
 import EasyEdit
-# import os
+import os
 from EasyEdit.easyeditor import BaseEditor
 from EasyEdit.easyeditor import ROMEHyperParams
 from EasyEdit.easyeditor import MEMITHyperParams
@@ -70,8 +70,8 @@ class KnowledgeEditor():
             # hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
             hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/MEMIT/bloom-7b1.yaml')
         if 'qwen' in self.model_name.lower():
-            hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
-            # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
+            # hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
+            hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
             tokenizer.pad_token = "<|endoftext|>"
 
 
@@ -277,11 +277,14 @@ class KnowledgeEditor():
 
         for lang in LANGS:
             e_result = evaluate_metrics(acc_golds[lang], acc_preds[lang])
-            acc = f"EM:{round(e_result['exact_match'], 2)} / F1:{round(e_result['f1'], 2)}"
+            # acc = f"EM:{round(e_result['exact_match'], 2)} / F1:{round(e_result['f1'], 2)}"
+            acc = f"{round(e_result['f1'], 2)}"
             loc_results = [evaluate_metrics(loc_golds[lang][i_lang], loc_preds[lang][i_lang]) for i_lang in LANGS]
             gen_results = [evaluate_metrics(gen_golds[lang][i_lang], gen_preds[lang][i_lang]) for i_lang in LANGS]
-            loc_results = [f"EM:{round(r['exact_match'], 2)} / F1:{round(r['f1'], 2)}" for r in loc_results]
-            gen_results = [f"EM:{round(r['exact_match'], 2)} / F1:{round(r['f1'], 2)}" for r in gen_results]
+            # loc_results = [f"EM:{round(r['exact_match'], 2)} / F1:{round(r['f1'], 2)}" for r in loc_results]
+            # gen_results = [f"EM:{round(r['exact_match'], 2)} / F1:{round(r['f1'], 2)}" for r in gen_results]
+            loc_results = [f"{round(r['f1'], 2)}" for r in loc_results]
+            gen_results = [f"{round(r['f1'], 2)}" for r in gen_results]
             final_results.loc[lang] = [acc] + gen_results + loc_results
 
         self.final_results = self.add_meta_info(final_results)
@@ -307,13 +310,15 @@ class KnowledgeEditor():
 
 
 def main():
-    for exp in [("Qwen", "Qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv", "Qwen/Qwen-7B"),
-                # ("Bloom", "Experiments/12-02-meeting/qwen_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv", "bigscience/bloom-7b1")
+    for exp in [
+                ("Qwen", "Experiments/07-03-meeting/Qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv", "Qwen/Qwen-7B"),
+                # ("Bloom", "Experiments/17-01-meeting/mke_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv", "bigscience/bloom-7b1")
                 ]:
-        ke = KnowledgeEditor(model_name=exp[3], exp_name=exp[0], eval_results_path=exp[2], from_file=exp[1])
-        ke.edit()
-        ke.save_results()
+        ke = KnowledgeEditor(model_name=exp[3], exp_name=exp[0], eval_results_path=exp[2],
+                             # from_file=exp[1]
+                             )
+        ke.edit(n_samples=5)
+        # ke.save_results()
 
         # ke.calculate_editing_result_metrics(gen_to_know=False)
-        # ke.calculate_editing_result_metrics(gen_to_know=True)
-
+        # ke.calculate_editing_result_metrics(gen_to_know=False)
