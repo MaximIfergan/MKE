@@ -1,5 +1,3 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "4"
 import Dataset.DatasetBuilder as DatasetBuilder
 import util
 # import LingualKnowledgeTransfer.knowledge_evaluator
