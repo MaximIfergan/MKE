@@ -1,3 +1,7 @@
+import os
+print("os.environ[]")
+print(os.environ["CUDA_VISIBLE_DEVICES"])
+os.environ["CUDA_VISIBLE_DEVICES"] = "4"
 import Dataset.DatasetBuilder as DatasetBuilder
 import util
 # import LingualKnowledgeTransfer.knowledge_evaluator
@@ -5,7 +9,6 @@ import LingualKnowledgeTransfer.knowledge_editor
 import LingualKnowledgeTransfer.edition_analysis
 import json
 import logging
-import os
 
 
 def init_logger():
