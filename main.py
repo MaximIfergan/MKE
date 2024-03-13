@@ -1,6 +1,4 @@
 import os
-print("os.environ[]")
-print(os.environ["CUDA_VISIBLE_DEVICES"])
 os.environ["CUDA_VISIBLE_DEVICES"] = "4"
 import Dataset.DatasetBuilder as DatasetBuilder
 import util
