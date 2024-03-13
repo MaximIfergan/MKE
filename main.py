@@ -1,3 +1,5 @@
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 import Dataset.DatasetBuilder as DatasetBuilder
 import util
 # import LingualKnowledgeTransfer.knowledge_evaluator
