@@ -72,8 +72,10 @@ class KnowledgeEditor():
         if 'qwen' in self.model_name.lower():
             # hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
             # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
-            hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/mistral-7b.yaml")
             # tokenizer.pad_token = "<|endoftext|>"
+
+            hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/mistral-7b.yaml")
+            tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
             tokenizer.pad_token_id = tokenizer.eos_token_id
 
         known_facts = self.known_facts
