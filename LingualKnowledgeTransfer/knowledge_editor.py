@@ -74,7 +74,7 @@ class KnowledgeEditor():
             # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
             hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/mistral-7b.yaml")
             # tokenizer.pad_token = "<|endoftext|>"
-
+            tokenizer.pad_token_id = tokenizer.eos_token_id
 
         known_facts = self.known_facts
         if n_samples:
