@@ -321,7 +321,7 @@ def main():
                 eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv",
                 from_file="Experiments/17-01-meeting/mke_edition.json")
 
-    qwen = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1", exp_name="mistral-7b_try",
+    mistral = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1", exp_name="mistral-7b_try",
                 eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv",
                 from_file="")
 
