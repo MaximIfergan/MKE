@@ -315,7 +315,7 @@ class KnowledgeEditor():
 
 def main():
     for exp in [
-                ("Qwen", "Experiments/07-03-meeting/Qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv", "Qwen/Qwen-7B"),
+                # ("Qwen", "Experiments/07-03-meeting/Qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv", "Qwen/Qwen-7B"),
                 ("Mistral", "", "Experiments/12-02-meeting/qwen_evaluation.csv", "mistralai/Mistral-7B-v0.1"),
                 # ("Bloom", "Experiments/17-01-meeting/mke_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv", "bigscience/bloom-7b1")
                 ]:
