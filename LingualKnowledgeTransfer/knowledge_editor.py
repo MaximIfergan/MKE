@@ -61,16 +61,17 @@ class KnowledgeEditor():
 
         results = self.results
 
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False, padding_side="left",
-                                                  trust_remote_code=True)
-
         logging.info(f"Loading edition HyperParams")
 
         if 'bloom' in self.model_name.lower():
             # hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
+            tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False, padding_side="left",
+                                                      trust_remote_code=True)
             hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/MEMIT/bloom-7b1.yaml')
         if 'qwen' in self.model_name.lower():
             hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
+            tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False, padding_side="left",
+                                                      trust_remote_code=True)
             tokenizer.pad_token = "<|endoftext|>"
             # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
         if 'mistral' in self.model_name.lower():
