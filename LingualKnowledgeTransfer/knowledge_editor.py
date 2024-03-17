@@ -39,10 +39,11 @@ def get_prefix(input_string):  # TODO: delete duplicate in KE
 
 class KnowledgeEditor():
 
-    def __init__(self, model_name, eval_results_path, from_file=None, dataset_path=DATASET_PATH, exp_name=""):
+    def __init__(self, model_name, model_path, eval_results_path, from_file=None, dataset_path=DATASET_PATH, exp_name=""):
         self.locality_prompts = None
         self.final_results = None
         self.known_facts = None
+        self.model_path = model_path
         self.from_file = from_file
         self.results = dict() if from_file is None else load_json_file(from_file)[0]
         self.model_name = model_name
@@ -52,7 +53,7 @@ class KnowledgeEditor():
         self.compute_known_facts()
         self.build_locality_prompts()
 
-    def edit(self, bs=1, n_samples=None, fewshot=True, checkpoint=True):
+    def edit(self, bs=1, method="ROME", n_samples=None, fewshot=True, checkpoint=True):
 
         if self.from_file is None:
             logging.info(f"Starting {self.exp_name} editing")
@@ -63,19 +64,21 @@ class KnowledgeEditor():
 
         logging.info(f"Loading edition HyperParams")
 
+        if method == "ROME":
+            hparams = ROMEHyperParams.from_hparams(f'EasyEdit/hparams/ROME/{self.model_name}.yaml')
+        elif method == "MEMIT":
+            hparams = MEMITHyperParams.from_hparams(f"EasyEdit/hparams/MEMIT/{self.model_name}.yaml")
+        elif method == "FT":
+            pass
+
         if 'bloom' in self.model_name.lower():
-            # hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/ROME/bloom-7b1.yaml')
-            tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False, padding_side="left",
+            tokenizer = AutoTokenizer.from_pretrained(self.model_path, use_fast=False, padding_side="left",
                                                       trust_remote_code=True)
-            hparams = ROMEHyperParams.from_hparams('EasyEdit/hparams/MEMIT/bloom-7b1.yaml')
         if 'qwen' in self.model_name.lower():
-            hparams = ROMEHyperParams.from_hparams("EasyEdit/hparams/ROME/qwen-7b.yaml")
-            tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False, padding_side="left",
+            tokenizer = AutoTokenizer.from_pretrained(self.model_path, use_fast=False, padding_side="left",
                                                       trust_remote_code=True)
             tokenizer.pad_token = "<|endoftext|>"
-            # hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/qwen-7b.yaml")
         if 'mistral' in self.model_name.lower():
-            hparams = MEMITHyperParams.from_hparams("EasyEdit/hparams/MEMIT/mistral-7b.yaml")
             tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
             tokenizer.pad_token_id = tokenizer.eos_token_id
 
@@ -127,7 +130,7 @@ class KnowledgeEditor():
                 subject=dataset_sample['subj']["label"][sample_lang],
                 keep_original_weight=False,
                 s_id=res_key
-                )
+            )
             # except torch.cuda.OutOfMemoryError:
             #     del editor
             #     torch.cuda.empty_cache()
@@ -162,11 +165,6 @@ class KnowledgeEditor():
 
             # = eval all:
             for batch in batch_eval:
-
-                # # TODO delete only for debug
-                # batch_sents = [e[1] for e in batch if e[0].split("_")[0] in ["en", "fr", "ar"]]
-                # if not batch_sents:
-                #     continue
 
                 batch_sents = [e[1] for e in batch]
 
@@ -314,15 +312,23 @@ class KnowledgeEditor():
 
 
 def main():
-    for exp in [
-                # ("Qwen", "Experiments/07-03-meeting/Qwen_edition.json", "Experiments/12-02-meeting/qwen_evaluation.csv", "Qwen/Qwen-7B"),
-                ("Mistral", "", "Experiments/12-02-meeting/qwen_evaluation.csv", "mistralai/Mistral-7B-v0.1"),
-                # ("Bloom", "Experiments/17-01-meeting/mke_edition.json", "Experiments/17-01-meeting/mke_evaluation.csv", "bigscience/bloom-7b1")
-                ]:
-        ke = KnowledgeEditor(model_name=exp[3], exp_name=exp[0], eval_results_path=exp[2],
-                             # from_file=exp[1]
-                             )
-        ke.edit(n_samples=5)
+
+    qwen = dict(model_name="qwen-7b", model_path="Qwen/Qwen-7B", exp_name="qwen-7b_try",
+                eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv",
+                from_file="Experiments/07-03-meeting/Qwen_edition.json")
+
+    bloom = dict(model_name="bloom-7b", model_path="bigscience/bloom-7b1", exp_name="bloom-7b_try",
+                eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv",
+                from_file="Experiments/17-01-meeting/mke_edition.json")
+
+    qwen = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1", exp_name="mistral-7b_try",
+                eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv",
+                from_file="")
+
+    for exp in [qwen]:
+        ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
+                             eval_results_path=exp["eval_results_path"])
+        ke.edit(n_samples=5, method="MEMIT")
         # ke.save_results()
 
         # ke.calculate_editing_result_metrics(gen_to_know=False)
