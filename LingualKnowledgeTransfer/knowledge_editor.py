@@ -317,7 +317,7 @@ def main():
                 eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv",
                 from_file="Experiments/07-03-meeting/Qwen_edition.json")
 
-    bloom = dict(model_name="bloom-7b", model_path="bigscience/bloom-7b1", exp_name="bloom-7b_try",
+    bloom = dict(model_name="bloom-7b1", model_path="bigscience/bloom-7b1", exp_name="bloom-7b1_try",
                 eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv",
                 from_file="Experiments/17-01-meeting/mke_edition.json")
 
