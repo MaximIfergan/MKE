@@ -195,7 +195,7 @@ class KnowledgeEditor():
                                                            "gold": batch[j][2]}
 
             # Print edit example for debug:
-            if i % 20 == 0:
+            if i % 1 == 0:
                 msg = "===                                      ===\n"
                 msg += f"Editing example for {sample_id} in {sample_lang}:\n"
                 msg += f"{ground_truth} -> {target_new}: {dataset_sample['prompt'][sample_lang]}\n"
@@ -216,9 +216,10 @@ class KnowledgeEditor():
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = [tuple(x) for x in known_ids.values]
 
-        # # # TODO For debug
+        random.shuffle(self.known_facts)  # TODO For debug
+
+        # # TODO For debug
         # self.known_facts = [x for x in self.known_facts if x[1] in ["ar", "he", "ru"]]
-        # random.shuffle(self.known_facts)
         # random.shuffle(self.known_facts)
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
