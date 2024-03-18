@@ -216,11 +216,10 @@ class KnowledgeEditor():
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = [tuple(x) for x in known_ids.values]
 
-        random.shuffle(self.known_facts)  # TODO For debug
-
         # # TODO For debug
-        # self.known_facts = [x for x in self.known_facts if x[1] in ["ar", "he", "ru"]]
-        # random.shuffle(self.known_facts)
+        random.shuffle(self.known_facts)  # TODO For debug
+        self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr"]]
+        random.shuffle(self.known_facts)
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
         df_suc = self.eval_results[self.eval_results['F1'] > F1_SUCCESS].sample(frac=1)
@@ -329,7 +328,7 @@ def main():
     for exp in [bloom]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
                              eval_results_path=exp["eval_results_path"])
-        ke.edit(n_samples=10, method="MEMIT")
+        ke.edit(n_samples=20, method="MEMIT")
         # ke.save_results()
 
         # ke.calculate_editing_result_metrics(gen_to_know=False)
