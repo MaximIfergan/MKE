@@ -328,7 +328,7 @@ def main():
     for exp in [bloom]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
                              eval_results_path=exp["eval_results_path"])
-        ke.edit(n_samples=20, method="MEMIT")
+        ke.edit(n_samples=2, method="MEMIT")
         # ke.save_results()
 
         # ke.calculate_editing_result_metrics(gen_to_know=False)
