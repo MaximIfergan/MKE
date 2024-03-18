@@ -1,9 +1,7 @@
 import torch.cuda
 import EasyEdit
 import os
-from EasyEdit.easyeditor import BaseEditor
-from EasyEdit.easyeditor import ROMEHyperParams
-from EasyEdit.easyeditor import MEMITHyperParams
+from EasyEdit.easyeditor import BaseEditor, ROMEHyperParams, MEMITHyperParams, FTHyperParams
 import json
 import pandas as pd
 from transformers import AutoTokenizer
@@ -69,7 +67,7 @@ class KnowledgeEditor():
         elif method == "MEMIT":
             hparams = MEMITHyperParams.from_hparams(f"EasyEdit/hparams/MEMIT/{self.model_name}.yaml")
         elif method == "FT":
-            pass
+            hparams = FTHyperParams.from_hparams(f"EasyEdit/hparams/FT/{self.model_name}.yaml")
 
         if 'bloom' in self.model_name.lower():
             tokenizer = AutoTokenizer.from_pretrained(self.model_path, use_fast=False, padding_side="left",
@@ -325,10 +323,10 @@ def main():
                 eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv",
                 from_file="")
 
-    for exp in [bloom]:
+    for exp in [mistral]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
                              eval_results_path=exp["eval_results_path"])
-        ke.edit(n_samples=2, method="MEMIT")
+        ke.edit(n_samples=2, method="FT")
         # ke.save_results()
 
         # ke.calculate_editing_result_metrics(gen_to_know=False)

@@ -56,17 +56,20 @@ class EditionAnalysis:
 
     def preprocess_rome(self, change):
         """Preprocess changes for ROME method."""
-        if self.model_name == "qwen":
-            right_vec, left_vec = change['transformer.h.5.mlp.c_proj.weight']
-            preprocess_change = (right_vec.unsqueeze(1) @ left_vec.unsqueeze(0)).to(
-                torch.float16).clone().detach().flatten()
-        else:
-            return change
+        for key in change:   # Only one key
+            right_vec, left_vec = change[key]
+            preprocess_change = (right_vec.unsqueeze(1) @
+                                 left_vec.unsqueeze(0)).to(torch.float16).clone().detach().flatten()
         return preprocess_change
 
     def preprocess_memit(self, change):
         """Preprocess changes for MEMIT method."""
-        return change
+        layers_changes = []
+        for w_name, (key_mat, val_mat) in change.items():
+            upd_matrix = key_mat @ val_mat.T
+            layers_changes.append(upd_matrix.to(torch.float16).clone().detach().flatten())
+        layers_changes = np.stack(layers_changes)
+        return layers_changes
 
     def calculate_distances(self, instances, method, similarity):
         """Calculate distances between instances using the specified editing method and similarity measure."""
