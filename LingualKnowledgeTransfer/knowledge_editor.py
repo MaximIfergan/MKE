@@ -323,7 +323,7 @@ def main():
                 eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv",
                 from_file="")
 
-    for exp in [qwen]:
+    for exp in [mistral]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
                              eval_results_path=exp["eval_results_path"])
         ke.edit(n_samples=10, method="FT")
