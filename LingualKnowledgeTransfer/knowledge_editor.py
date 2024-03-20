@@ -225,7 +225,7 @@ class KnowledgeEditor():
         random.shuffle(self.known_facts)
         balance_know = []
         for lang in LANGS:
-            balance_know.append([x for x in self.known_facts if x[1] == lang][:200])
+            balance_know += [x for x in self.known_facts if x[1] == lang][:200]
         self.known_facts = balance_know
 
         # TODO For debug
