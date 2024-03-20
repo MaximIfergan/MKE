@@ -328,7 +328,7 @@ def main():
                 from_file="Experiments/17-01-meeting/mke_edition.json")
 
     mistral = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1", exp_name="mistral-7b",
-                eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv", from_file="")
+                eval_results_path="mistral_evaluation.csv", from_file="")
 
     for exp in [mistral]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
