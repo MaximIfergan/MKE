@@ -162,6 +162,7 @@ class KnowledgeEvaluator:
                     self.results = pd.concat([self.results, final_results])
                 else:
                     self.results = final_results
+                # TODO: Fix it brings alot of dups
                 self.save_results()
 
             sample_id = sample["id"]

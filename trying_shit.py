@@ -1,10 +1,14 @@
-import util
 import pandas as pd
 import pickle
 import pandas as pd
+import util
 
-a = pd.read_csv("mistral_evaluation.csv")
-print()
+a = pd.read_csv("Experiments/21-03-meeting/mistral_evaluation.csv")
+eval_result = util.evaluate_metrics(list(a["gold"]), list(a["pred"]))
+a["F1"] = eval_result['f1_scores']
+a["EM"] = eval_result['exact_match_scores']
+a = a.drop_duplicates()
+a.to_csv("mistral_evaluation.csv", index=False)
 exit(0)
 
 with open('12430_fr_MEMIT_bloom.pickle', 'rb') as f:
