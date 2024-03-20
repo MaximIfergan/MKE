@@ -365,7 +365,7 @@ def main():
 
     for exp in [mistral]:
         ke = KnowledgeEvaluator(exp_name=exp["exp_name"], model_name=exp["model_name"], model_path=exp["model_path"])
-        ke.eval(n_samples=10)
+        ke.eval()
         ke.save_results()
 
     # if "BLOOM" == exp[0]:

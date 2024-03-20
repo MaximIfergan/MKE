@@ -1,12 +1,14 @@
 import util
 import pandas as pd
 import pickle
+import pandas as pd
 
-with open('12430_fr_MEMIT_bloom.pickle', 'rb') as f:
-    loaded_dict = pickle.load(f)
+a = pd.read_csv("mistral_evaluation.csv")
 print()
 exit(0)
 
+with open('12430_fr_MEMIT_bloom.pickle', 'rb') as f:
+    loaded_dict = pickle.load(f)
 for key in loaded_dict:
     upd_matrix = loaded_dict[key][0].unsqueeze(1) @ loaded_dict[key][1].unsqueeze(0)
 
