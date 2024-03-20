@@ -53,6 +53,8 @@ class KnowledgeEditor():
 
     def edit(self, bs=1, method="ROME", n_samples=None, fewshot=True, checkpoint=True):
 
+        flag = True
+
         if self.from_file is None:
             logging.info(f"Starting {self.exp_name} editing")
         else:
@@ -102,7 +104,7 @@ class KnowledgeEditor():
         for i, sample in tqdm(enumerate(known_facts), total=len(known_facts)):
 
             # === save temp results in crash case:
-            if i != 0 and checkpoint and i % 2 == 0:
+            if i != 0 and checkpoint and i % 20 == 0:
                 logging.info(f"Saving edition results back-up at step {i} to {self.exp_name}.json")
                 self.results = results
                 self.save_results()
@@ -174,7 +176,13 @@ class KnowledgeEditor():
                     # pad_token_id = tokenizer.eos_token_id if 'mistral' in self.model_name.lower() else None
                 )
 
-                text_output = [tokenizer.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
+                try:
+                    text_output = [tokenizer.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
+                except:
+                    logging.error(f"pyo3_runtime.PanicException: no entry found for key")
+                    flag = False
+                    break
+
                 text_output = [get_prefix(text_output[i][len(batch_sents[i]) + 1:]) for i in range(len(batch_sents))]
 
                 # = save batch eval:
@@ -193,7 +201,7 @@ class KnowledgeEditor():
                                                            "gold": batch[j][2]}
 
             # Print edit example for debug:
-            if i % 1 == 0:
+            if i % 20 == 0 and flag:
                 msg = "===                                      ===\n"
                 msg += f"Editing example for {sample_id} in {sample_lang}:\n"
                 msg += f"{ground_truth} -> {target_new}: {dataset_sample['prompt'][sample_lang]}\n"
@@ -214,10 +222,10 @@ class KnowledgeEditor():
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = [tuple(x) for x in known_ids.values]
 
-        # # TODO For debug
-        random.shuffle(self.known_facts)  # TODO For debug
-        self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr"]]
-        random.shuffle(self.known_facts)
+        # TODO For debug
+        # random.shuffle(self.known_facts)  # TODO For debug
+        # self.known_facts = [x for x in self.known_facts if x[1] in ["en", "fr"]]
+        # random.shuffle(self.known_facts)
 
     def build_locality_prompts(self, size_per_lang=200, fewshot=True):
         df_suc = self.eval_results[self.eval_results['F1'] > F1_SUCCESS].sample(frac=1)
@@ -313,7 +321,7 @@ def main():
 
     qwen = dict(model_name="qwen-7b", model_path="Qwen/Qwen-7B", exp_name="qwen-7b_memit",
                 eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv",
-                from_file="Experiments/07-03-meeting/Qwen_edition.json")
+                from_file="qwen-7b_memit_edition.json")
 
     bloom = dict(model_name="bloom-7b1", model_path="bigscience/bloom-7b1", exp_name="bloom-7b1_try",
                 eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv",
@@ -325,7 +333,7 @@ def main():
 
     for exp in [qwen]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
-                             eval_results_path=exp["eval_results_path"])
+                             eval_results_path=exp["eval_results_path"], from_file=qwen["from_file"])
         ke.edit(method="MEMIT")
         # ke.save_results()
 
