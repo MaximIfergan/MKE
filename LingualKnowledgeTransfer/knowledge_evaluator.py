@@ -133,7 +133,7 @@ class KnowledgeEvaluator:
                                                       trust_remote_code=True)
             self.tok.pad_token = "<|endoftext|>"
         if 'mistral' in self.model_name.lower():
-            self.model = AutoModelForCausalLM.from_pretrained(self.model_path, torch_dtype=torch.float32)
+            self.model = AutoModelForCausalLM.from_pretrained(self.model_path, torch_dtype=torch.float32).to(DEVICE)
             self.tok = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
             self.tok.pad_token_id = self.tok.eos_token_id
 
