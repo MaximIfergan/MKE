@@ -103,7 +103,7 @@ class KnowledgeEvaluator:
         self.model_path = model_path
         self.tok = None
         self.dataset = load_json_file(dataset_path)
-        # random.shuffle(self.dataset)  # TODO: For debug
+        random.shuffle(self.dataset)
         # self.dataset = self.dataset[:130]  # TODO: For debug
         self.exp_name = exp_name
         self.from_file = from_file
@@ -365,7 +365,7 @@ def main():
 
     for exp in [mistral]:
         ke = KnowledgeEvaluator(exp_name=exp["exp_name"], model_name=exp["model_name"], model_path=exp["model_path"])
-        ke.eval(n_samples=50, bs=5)
+        ke.eval()
         ke.save_results()
 
     # if "BLOOM" == exp[0]:
