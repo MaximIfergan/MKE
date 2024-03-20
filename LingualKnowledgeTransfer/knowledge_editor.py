@@ -226,6 +226,7 @@ class KnowledgeEditor():
         for lang in LANGS:
             balance_know += [x for x in self.known_facts if x[1] == lang][:200]
         self.known_facts = balance_know
+        random.shuffle(self.known_facts)
 
         # TODO For debug
         # random.shuffle(self.known_facts)  # TODO For debug
@@ -332,11 +333,11 @@ def main():
                 from_file="Experiments/17-01-meeting/mke_edition.json")
 
     mistral = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1", exp_name="mistral-7b",
-                eval_results_path="mistral_evaluation.csv", from_file="")
+                eval_results_path="mistral_evaluation.csv", from_file="mistral-7b_edition.json")
 
     for exp in [mistral]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
-                             eval_results_path=exp["eval_results_path"])
+                             eval_results_path=exp["eval_results_path"], from_file=exp["from_file"])
         ke.edit(method="ROME")
         # ke.save_results()
 
