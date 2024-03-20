@@ -365,15 +365,15 @@ def main():
     mistral = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1",  exp_name="mistral", from_file="")
 
     for exp in [mistral]:
-        ke = KnowledgeEvaluator(exp_name=exp["exp_name"], model_name=exp["model_name"], model_path=exp["model_path"])
-        ke.eval()
-        ke.save_results()
+        ke = KnowledgeEvaluator(exp_name=exp["exp_name"], model_name=exp["model_name"], model_path=exp["model_path"], from_file="Experiments/21-03-meeting/mistral_evaluation.csv")
+        ke.plot_results_by("lang")
+        ke.plot_results_by("rel")
+        ke.plot_number_of_languages_per_question_by_languages()
+        # ke.eval()
+        # ke.save_results()
 
     # if "BLOOM" == exp[0]:
     #     ke.append_metadata_info()
-    # ke.plot_results_by("lang")
-    # ke.plot_results_by("rel")
-    # ke.plot_number_of_languages_per_question_by_languages()
     # ke.plot_languages_relation_performance_mat()
     # ke.plot_results_by("lang", filter={"col": "rel", "value": "geo_continent"})
     # ke.plot_results_by("origin", filter={"col": "lang", "value": "en"})

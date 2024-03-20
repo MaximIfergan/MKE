@@ -1,8 +1,8 @@
 import Dataset.DatasetBuilder as DatasetBuilder
 import util
-import LingualKnowledgeTransfer.knowledge_evaluator
+# import LingualKnowledgeTransfer.knowledge_evaluator
 import LingualKnowledgeTransfer.knowledge_editor
-import LingualKnowledgeTransfer.edition_analysis
+# import LingualKnowledgeTransfer.edition_analysis
 import json
 import logging
 

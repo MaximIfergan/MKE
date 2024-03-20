@@ -221,7 +221,12 @@ class KnowledgeEditor():
         eval_known_facts = self.eval_results[self.eval_results['F1'] >= F1_SUCCESS]
         known_ids = eval_known_facts[["id", "lang"]]
         self.known_facts = [tuple(x) for x in known_ids.values]
+
         random.shuffle(self.known_facts)
+        balance_know = []
+        for lang in LANGS:
+            balance_know.append([x for x in self.known_facts if x[1] == lang][:200])
+        self.known_facts = balance_know
 
         # TODO For debug
         # random.shuffle(self.known_facts)  # TODO For debug
