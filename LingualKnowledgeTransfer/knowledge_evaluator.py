@@ -185,7 +185,8 @@ class KnowledgeEvaluator:
                 model_output = self.model.generate(
                     input_ids=tok_batch['input_ids'].to(DEVICE),
                     attention_mask=tok_batch['attention_mask'].to(DEVICE),
-                    max_new_tokens=5
+                    max_new_tokens=5,
+                    pad_token_id=self.tok.eos_token_id
                 )
                 batch_preds = [self.tok.decode(x) for x in model_output.detach().cpu().numpy().tolist()]
                 batch_preds = [get_prefix(batch_preds[i][len(batch[i]) + 1:]) for i in range(len(batch))]
