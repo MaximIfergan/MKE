@@ -311,7 +311,7 @@ class KnowledgeEditor():
 
 def main():
 
-    qwen = dict(model_name="qwen-7b", model_path="Qwen/Qwen-7B", exp_name="qwen-7b_try",
+    qwen = dict(model_name="qwen-7b", model_path="Qwen/Qwen-7B", exp_name="qwen-7b_memit",
                 eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv",
                 from_file="Experiments/07-03-meeting/Qwen_edition.json")
 
@@ -326,7 +326,7 @@ def main():
     for exp in [qwen]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
                              eval_results_path=exp["eval_results_path"])
-        ke.edit(n_samples=20, method="MEMIT")
+        ke.edit(method="MEMIT")
         # ke.save_results()
 
         # ke.calculate_editing_result_metrics(gen_to_know=False)
