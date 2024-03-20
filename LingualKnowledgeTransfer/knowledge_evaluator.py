@@ -96,9 +96,11 @@ def annotate_heatmap(im, data=None, textcolors=("black", "white"), threshold=Non
 
 class KnowledgeEvaluator:
 
-    def __init__(self, dataset_path=DATASET_PATH, from_file=None, exp_name=""):
+    def __init__(self, model_name, model_path, dataset_path=DATASET_PATH, from_file=None, exp_name=""):
         self.known = None
         self.model = None
+        self.model_name = model_name
+        self.model_path = model_path
         self.tok = None
         self.dataset = load_json_file(dataset_path)
         # random.shuffle(self.dataset)  # TODO: For debug
@@ -109,22 +111,31 @@ class KnowledgeEvaluator:
         if from_file:
             self.compute_known_facts()
 
-    def eval(self, model_name, bs=1, n_samples=None, fewshot=True, space=False, checkpoint=True):
+    def eval(self, bs=1, n_samples=None, fewshot=True, space=False, checkpoint=True):
 
         if self.results is None:
             logging.info(f"Starting {self.exp_name} Evaluation")
         else:
             logging.info(f"Resuming evaluation from results {self.from_file}")
 
-        logging.info(f"Loading {model_name} to {DEVICE}")
-        self.tok = AutoTokenizer.from_pretrained(model_name, use_fast=False, padding_side="left",
-                                                 trust_remote_code=True)
-        if model_name == "Qwen/Qwen-7B":
-            self.tok.pad_token = "<|endoftext|>"
+        logging.info(f"Loading {self.model_name} to {DEVICE}")
 
-        self.model = AutoModelForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True,
-                                                          torch_dtype=torch.float16,  # For BLOOM cancel '#'
-                                                          trust_remote_code=True).to(DEVICE)
+        if 'bloom' in self.model_name.lower():
+            self.model = AutoModelForCausalLM.from_pretrained(self.model_path, low_cpu_mem_usage=True,
+                                                              trust_remote_code=True).to(DEVICE)
+            self.tok = AutoTokenizer.from_pretrained(self.model_path, use_fast=False, padding_side="left",
+                                                      trust_remote_code=True)
+        if 'qwen' in self.model_name.lower():
+            self.model = AutoModelForCausalLM.from_pretrained(self.model_path, low_cpu_mem_usage=True,
+                                                              torch_dtype=torch.float16,
+                                                              trust_remote_code=True).to(DEVICE)
+            self.tok = AutoTokenizer.from_pretrained(self.model_path, use_fast=False, padding_side="left",
+                                                      trust_remote_code=True)
+            self.tok.pad_token = "<|endoftext|>"
+        if 'mistral' in self.model_name.lower():
+            self.tok = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
+            self.tok.pad_token_id = self.tok.eos_token_id
+
         self.model.eval()
 
         dataset = self.dataset
@@ -343,17 +354,24 @@ class KnowledgeEvaluator:
 
 
 def main():
-    # "Qwen/Qwen-7B", "meta-llama/Llama-2-7b", "bigscience/bloom-7b1"
-    for exp in [("Qwen", "Experiments/12-02-meeting/qwen_evaluation.csv"),
-                ("BLOOM", "Experiments/17-01-meeting/mke_evaluation.csv")]:
-        ke = KnowledgeEvaluator(exp_name=exp[0], from_file=exp[1])
-        if "BLOOM" == exp[0]:
-            ke.append_metadata_info()
-        ke.plot_results_by("lang")
-        ke.plot_results_by("rel")
-        ke.plot_number_of_languages_per_question_by_languages()
-        ke.plot_languages_relation_performance_mat()
 
+    qwen = dict(model_name="qwen-7b", model_path="Qwen/Qwen-7B", exp_name="qwen-7b_try", from_file="")
+
+    bloom = dict(model_name="bloom-7b1", model_path="bigscience/bloom-7b1", exp_name="bloom-7b1_try", from_file="")
+
+    mistral = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1",  exp_name="mistral", from_file="")
+
+    for exp in [mistral]:
+        ke = KnowledgeEvaluator(exp_name=exp["exp_name"], model_name=exp["model_name"], model_path=exp["model_path"])
+        ke.eval(n_samples=10)
+
+
+    # if "BLOOM" == exp[0]:
+    #     ke.append_metadata_info()
+    # ke.plot_results_by("lang")
+    # ke.plot_results_by("rel")
+    # ke.plot_number_of_languages_per_question_by_languages()
+    # ke.plot_languages_relation_performance_mat()
     # ke.plot_results_by("lang", filter={"col": "rel", "value": "geo_continent"})
     # ke.plot_results_by("origin", filter={"col": "lang", "value": "en"})
     # ke.plot_results_by("rel", filter={"col": "lang", "value": "en"})
@@ -364,4 +382,3 @@ def main():
     # ke.append_metadata_info()
     # # ke.eval(model_name="Qwen/Qwen-7B", n_samples=0)
     # ke.save_results()
-
