@@ -331,7 +331,7 @@ class KnowledgeEvaluator:
         self.known = {tuple(x) for x in known_ids.values}
 
     def save_results(self):
-        self.results.to_csv(f'{self.exp_name}_evaluation.csv', index=False)
+        self.results.to_csv(f'{self.exp_name}_evaluation.csv', index=False, sep="±")
 
     def results_stats(self, results=None):
         results = results if results is not None else self.results
