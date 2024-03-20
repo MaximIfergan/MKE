@@ -327,14 +327,13 @@ def main():
                 eval_results_path="Experiments/17-01-meeting/mke_evaluation.csv",
                 from_file="Experiments/17-01-meeting/mke_edition.json")
 
-    mistral = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1", exp_name="mistral-7b_try",
-                eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv",
-                from_file="")
+    mistral = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1", exp_name="mistral-7b",
+                eval_results_path="Experiments/12-02-meeting/qwen_evaluation.csv", from_file="")
 
-    for exp in [qwen]:
+    for exp in [mistral]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
-                             eval_results_path=exp["eval_results_path"], from_file=qwen["from_file"])
-        ke.edit(method="MEMIT")
+                             eval_results_path=exp["eval_results_path"])
+        ke.edit(method="ROME")
         # ke.save_results()
 
         # ke.calculate_editing_result_metrics(gen_to_know=False)
