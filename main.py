@@ -20,8 +20,8 @@ def init_logger():
 def main():
     init_logger()
     # DatasetBuilder.main()
-    LingualKnowledgeTransfer.knowledge_evaluator.main()
-    # LingualKnowledgeTransfer.knowledge_editor.main()
+    # LingualKnowledgeTransfer.knowledge_evaluator.main()
+    LingualKnowledgeTransfer.knowledge_editor.main()
     # LingualKnowledgeTransfer.edition_analysis.main()
 
 if __name__ == "__main__":
