@@ -170,7 +170,7 @@ class KnowledgeEditor():
                 model_output = edited_model.generate(
                     input_ids=batch_tok['input_ids'].to('cuda:0'),
                     attention_mask=batch_tok['attention_mask'].to('cuda:0'),
-                    max_new_tokens=5,
+                    max_new_tokens=8,
                     # pad_token_id = tokenizer.eos_token_id if 'mistral' in self.model_name.lower() else None
                 )
 
