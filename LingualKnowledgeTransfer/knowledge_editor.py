@@ -335,10 +335,10 @@ def main():
     mistral = dict(model_name="mistral-7b", model_path="mistralai/Mistral-7B-v0.1", exp_name="mistral-7b",
                 eval_results_path="mistral_evaluation.csv", from_file="mistral-7b_edition.json")
 
-    for exp in [mistral]:
+    for exp in [qwen]:
         ke = KnowledgeEditor(model_name=exp["model_name"], model_path=exp["model_path"], exp_name=exp["exp_name"],
                              eval_results_path=exp["eval_results_path"], from_file=exp["from_file"])
-        ke.edit(method="ROME")
+        ke.edit(method="MEMIT")
         # ke.save_results()
 
         # ke.calculate_editing_result_metrics(gen_to_know=False)
