@@ -121,20 +121,20 @@ class KnowledgeEditor():
             target_new = dataset_sample["target_true"]["label"][sample_lang]
             editor = BaseEditor.from_hparams(hparams)
 
-            # try:
-            metrics, edited_model, _ = editor.edit(
-                prompts=dataset_sample["prompt"][sample_lang],
-                ground_truth=ground_truth,
-                target_new=target_new,
-                subject=dataset_sample['subj']["label"][sample_lang],
-                keep_original_weight=False,
-                s_id=res_key
-            )
-            # except torch.cuda.OutOfMemoryError:
-            #     del editor
-            #     torch.cuda.empty_cache()
-            #     logging.error(f"torch.cuda.OutOfMemoryError for {sample}")
-            #     continue
+            try:
+                metrics, edited_model, _ = editor.edit(
+                    prompts=dataset_sample["prompt"][sample_lang],
+                    ground_truth=ground_truth,
+                    target_new=target_new,
+                    subject=dataset_sample['subj']["label"][sample_lang],
+                    keep_original_weight=False,
+                    s_id=res_key
+                )
+            except torch.cuda.OutOfMemoryError:
+                del editor
+                torch.cuda.empty_cache()
+                logging.error(f"torch.cuda.OutOfMemoryError for {sample}")
+                continue
 
             # === eval accuracy, generalization, locality:
 
